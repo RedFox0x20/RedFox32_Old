@@ -1,0 +1,60 @@
+Plan for the Kernel.
+
+We have now loaded the kernel and are capable of executing whatever 
+	 * Load drivers
+	 * - VESA
+	 * - Keyboard -- ? - A layer for converting Scancodes to ASCII (Unlikely)
+	 * Filesystem
+	 * - Load "files" into memory
+	 * - Write "files" to disk
+	 * - Executables... \
+	 * Executables
+	 * - Dependant on FS
+	 * - Load and run executables without error
+	 * - ELF
+	 * - Require some form of libc for syscall specific functions
+	 * 	 I.E VESA functions?
+	 * INT32 -- Used to call real mode functions
+	 *		 -- Primary use is for VESA to switch video modes through int 0x10
+	 *		 -- INT32 is already defined thanks to some code by a forum user
+	 *		 "Napalm" so thankfully this step has been kindly skipped for us
+	 *		 however some alterations need to be made to Napalms code to make it
+	 *		 compatable with this implementation.
+	 * Memory management
+	 * - Exposed malloc, free, etc etc.. Standard library stuff
+	 * Standard library for applications
+	 *
+	 * ------------------------------------------------------------------------
+	 *  In regards to loading of Drivers and subsequently user applications, a
+	 *  filesystem should be implemented directly within the Kernel, this
+	 *  filesystem could be Read Only or could be considered the Primary file
+	 *  system. Either way there needs to be a disk access layer that will allow
+	 *  the idea of "files" to exist for the user.
+	 *
+	 *  Standard filesystems such as FAT32 would be ideal to use for usability
+	 *  in addition to also allowing other system to access the files within the
+	 *  system. It is recogniseable that I have follows the FAT standard Boot
+	 *  Sector so this is completely possible to do... However, creating my own
+	 *  system for the sake of Learning is more inline with this project.
+	 *  Although, learning the ins and outs of a FAT32 system would provide
+	 *  further insite into the existing solutions to problems such as data
+	 *  storage.
+
+Partially implemented:
+	- Memory management
+	-- Memory management exists however it isn't perfectly safe
+		I.E. No checks to ensure that the memory in attempt to free is actually
+		an allocation region.
+
+ToDo and in What order:
+	- Take existing Video code and make it applicable for the Kernel for a brief
+	  period until Drivers are ready to be implemented.
+	- FileSystem
+	- ELF
+	- Drivers
+		- VESA
+		- Keyboard?
+	-
+	!! Certain elements will also need setting up, view
+	https://wiki.osdev.org/Expanded_Main_Page for a list of things to do pretty
+	much.

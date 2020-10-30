@@ -1,0 +1,25 @@
+BOOTLOADER
+==========
+
+The bootloader will consist of two stages, the Initial Loading Stage and the
+Setup Stage.
+
+Initial Loading Stage (ILS)
+===========================
+The ILS resides within the first sector of the Floppy Drive. This is loaded by
+the system BIOS to 0x7C00:0x0000.
+
+The ILS will load the second stage which is used for switching from Real Mode to
+Protected Mode. This will be performed using the BIOS functions available to us.
+
+Setup Stage
+===========
+The Setup Stage will be completely loaded by the ILS stage, it will use further
+BIOS functions to provide I/O in addition to pre-determined system structures
+that will be used for defining system operation. Once the system has been
+prepared for Protected Mode Operation we can switch and hand over control to the
+Kernel which should perform features such as further hardware control (Drivers)
+and provide a core feature-list which can be extended to create user software.
+
+Once we have entered Protected Mode we can use the C programming language.
+Everything before this point MUST be done in Assembly.

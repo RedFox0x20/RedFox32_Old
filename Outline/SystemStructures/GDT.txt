@@ -1,0 +1,45 @@
+- The Global Descriptor Table (GDT)
+	- The GDT is used to inform the CPU about memory segments.
+	- The GDT contains between 1 and 8192, 8 byte entries
+	- GDT Entries
+		- 2 bytes Limit low
+		- 2 bytes Base low
+		- 1 byte Base middle
+		- 1 byte Access
+			- 0 - Accessed bit - Always set 0
+			- 1 - Read/Write bit
+				- In code sectors - Can the code sector be read? Never writeable
+				- In data sectors - Is write access allowed? Always readable
+			- 2 - Direction/Conforming bit
+				- For data
+					- The segment grows up: 0
+					- The segment grows down: 1
+				- For code
+					- If 1, the code can be executed by an equal or lower
+					  privilege ring.
+					- If 0, the code can only be executed by the ring stated in
+					  bits 5 and 6
+			- 3 - Executable bit - should this memory region be executable?
+			- 4 - Descriptor type - Set 1 if the segment is code or data.
+			- 5 and 6 - Contains the ring level of the segment
+			- 7 - Must be set to 1
+		- 1 byte Granularity
+			- 0 through 3 - Limit high
+			- 4 and 5 - Set 0
+			- 6 - Size
+				- 0 if a Real mode 16 bit selector
+				- 1 if a Protected mode 32 bit selector
+			- 7 - Granularity
+				- If 0 then the limit is in 1 byte blocks
+				- If 1 then the limit is in 4Kb (page) blocks
+				- 1 byte Base high
+
+	- Loading the GDT is done using the lgdt instruction with the location of
+	  the gdt descriptor, a set of 3 bytes telling us the size of the table in
+	  bytes minus 1 and where it is in memory.
+
+	- In a flat layout the GDT will have a completely null descriptor, this sets
+	  the system so that address 0x0000:0x0000- cannot be used at all followed
+	  by two entries with a base of 0x00, and a limit of 0xFFFFFF
+
+

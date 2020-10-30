@@ -1,0 +1,23 @@
+# File types
+*.asm linguist-language=Assembly
+*.s linguist-language=Assembly
+*.c linguist-language=C
+*.h linguist-language=C
+*.md linguist-documentation=true
+*.txt linguist-documentation=true
+
+# Ignored file types
+*.ld linguist-detectable=false
+*.o linguist-detectable=false
+*.bin linguist-detectable=false
+*.dmp linguist-detectable=false
+*.pdf linguist-detectable=false
+
+# Specific files
+Makefile linguist-detectable=false
+
+# Directories
+Notes/* linguist-documentation=true
+Documentation/* linguist-documentation=true
+Img/* linguist-documentation=true
+Old/* linguist-detectable=false

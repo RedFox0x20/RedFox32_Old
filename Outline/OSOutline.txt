@@ -1,0 +1,65 @@
+Operating systems
+=================
+Bootloader
+- Initialises the system
+- Loads the kernel
+
+Kernel
+- The center of the OS, provides interfaces between software and hardware using
+  drivers
+- Contains features such as memory management and process management
+
+Drivers
+- A layer used to speak between the Kernel and Hardware, performs data
+  translations and operations to allow hardware to be controlled correctly.
+
+- (Legacy) BIOS Booting
+	- When using BIOS booting mode the BIOS will look for bootable devices. A
+	  bootable device is identified by the presence of the value 0x55AA existing
+	  at the end of the first sector. If this sector is marked as bootable it is
+	  loaded into memory at 0x0000:0x7C00. This is often referred to as the
+	  Master Boot Record. Once the data is loaded into memory, control is given
+	  to the code with execution beginning at 0x0000:0x7C00. Hard drives
+	  introduce a small caveat to this system, having the need for four table
+	  entries which identify the "Primary Partitions" of the disk, each of these
+	  entries is 16 bytes long.
+	  	- This first sector may also be known as the Bootloader as it is the
+		  first code executed after the BIOS and is used to load in more of our
+		  executable (and other) data.
+
+	- We must be cautious when booting with the BIOS as registers may contain
+	  *random* data, this also applies to special registers such as the FLAGS or
+	  SP register. The only value that we know will be correct is DL which
+	  contains the ID of the bootable drive which we can store and use in calls
+	  to BIOS functions for loading data.
+	
+	- Bootloaders may be contained solely within the first sector of the disk
+	  however this can be challenging and leaves little room for error checking.
+	  Due to the small 512 byte size constraint it may be necessary to use a so
+	  called "Multi-stage bootloader". A multi-stage bootloader will use the
+	  first sector to perform some parts of the initialisation process before
+	  loading in more sectors from the disk, these sectors are loaded into
+	  memory at some location determined by the parameters passed to the BIOS
+	  function, this data can then be jumped to. This system may be slower than
+	  a single stage bootloader however it allows for much more of the disk to
+	  be used in the booting process allowing for data such as error messages to
+	  be stored and additional functionality that could be used to help identify
+	  errors.
+	
+	- There is also single-stage bootloaders where the first stage does most of
+	  the initialisation and then then loads a stub program to make the
+	  protected mode switch and kernel entry.
+
+	- Once the system is initialized correctly to the desired degree, the
+	  bootloader will load in the kernel and enter the kernel code.
+
+Hardware devices
+- The keyboard
+	- Calls interrupt 1
+		- This interrupt requires special handling, to clear the interrupt we
+		  MUST read the value from the keyboard by reading in from port 0x60.
+		  Only then can we tell the PIC we have handled the interrupt
+	- The keyboard uses two ports
+		- 0x60 for data
+		- 0x64 for commands, this port can be used to switch between polling and
+		  interrupts.

@@ -1,0 +1,44 @@
+- Interrupts
+	- Interrupts are typically handled by two Programmable Interrupt Controllers
+	  (PICs), a "Master PIC" and a "Slave PIC". The PIC tells the CPU which
+	  interrupt is being called.
+
+	- Interrupts are triggered primarily by hardware devices such as interrupt
+	  dependant keyboard input where each key stroke calls a hardware interupt
+
+	- Software can also call a special interrupt, these calls are known as
+	  system calls. They are typically used to provide a communication layer
+	  between software and the kernel to tell the kernel we want to perform a
+	  specific action.
+
+	- Returning from interrupt functions requires the usage of a dedicated
+	  Interrupt Return instruction (iret). Unlike a regular function which would
+	  only require a ret instruction.
+
+	- To program interrupts we require an Interrupt Descriptor Table. This is
+	  very similar to the Global Descriptor Table in functionality as we define
+	  the table in memory then call the dedicated Load Interrupt Descriptor
+	  Table (lidt) instruction, the table should contain the addresses of all
+	  the interrupt functions in their given order.
+	  We must also inform the PICs that we do not want to use the default BIOS
+	  interrupts.
+
+	- Interrupts 0-31 are reserved by Intel in protected mode for CPU exceptions
+	  therefore when we map our interrupts in the IDT we use an offset of 32
+	  entries to map IRQs 0-15.
+
+	- If the IRQ given is IRQ 8 or higher then the interrupt came from the Slave
+	  PIC
+
+PIC Communication
+- When an interrupt is being called the PIC informs the CPU that an interrupt
+  has occured, once the CPU acknowledges the PIC, the PIC will then provide the
+  interrupt number to the CPU.
+
+- Once the CPU has handled the interrupt it must inform the PICs in one of two
+  ways.
+	- If the interrupt came from the Master PIC we output the value 0x20 on port
+	  0x20.
+	- If the interrupt came from the Slave PIC we output the value 0x20 to port
+	  0xA0 and then output the value 0x20 to port 0x20.
+

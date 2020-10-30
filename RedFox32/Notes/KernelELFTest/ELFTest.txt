@@ -1,0 +1,43 @@
+ELF Testing
+-=-=-=-=-=-
+C Code of a test Kernel.c file to create Build/Kernel/Kernel.kernel
+;-------------------------------------------------------------------------------;
+int KMain()
+{
+	char str[50] = "Entered the kernel!";
+	int i = 0;
+	while (str[i] != 0)
+	{
+		*(((char*)0xB8000)+i) = str[i];
+	}
+	return 0;
+}
+;-------------------------------------------------------------------------------;
+The following is a snippet from the compiled C code from above showing the KMain
+function
+;-------------------------------------------------------------------------------;
+KMain:
+00001067  EB16              jmp short 0x107f		; Ignore the code that write
+to the video memory
+
+WriteToVideoMemory:
+00001069  8B45FC            mov eax,[ebp-0x4]		; Load the index
+0000106C  8D9000800B00      lea edx,[eax+0xb8000]	; Load the address of Vmem +
+Index
+00001072  8D4DCA            lea ecx,[ebp-0x36]		; Load the string location
+00001075  8B45FC            mov eax,[ebp-0x4]		; Load the index
+00001078  01C8              add eax,ecx				; Add the index to location
+0000107A  0FB600            movzx eax,byte [eax]	; Load the character
+0000107D  8802              mov [edx],al			; Write the character
+
+TestByte:
+0000107F  8D55CA            lea edx,[ebp-0x36]		; Load string position
+00001082  8B45FC            mov eax,[ebp-0x4]		; Load index
+00001085  01D0              add eax,edx				; Add the index strpos
+00001087  0FB600            movzx eax,byte [eax]	; Load the character
+0000108A  84C0              test al,al				; Check for null byte
+0000108C  75DB              jnz 0x1069				; If not null, WriteToVMem
+0000108E  B800000000        mov eax,0x0				; Set return code 0
+00001093  C9                leave					; Cleanup stack
+00001094  C3                ret						; Return to caller
+;-------------------------------------------------------------------------------;

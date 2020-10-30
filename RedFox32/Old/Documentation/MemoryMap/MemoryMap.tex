@@ -1,0 +1,58 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[latin1]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{bytefield}
+
+\title{RedFox32\\A self learning exercise in low level x86 programming}
+\author{Tom W - RedFox0x20}
+
+
+\begin{document}
+\section{Memory map}
+\begin{bytefield}{16}
+\begin{leftwordgroup}{0x00000000\\0x000004FF}
+	\wordbox{3}{Real mode data\\1280B}
+\end{leftwordgroup}\\
+\begin{leftwordgroup}{0x00000500\\0x00007BFF}
+	\wordbox{3}{Stage2 / Kernel area\\30KB}
+\end{leftwordgroup}\\
+\begin{leftwordgroup}{0x00007C00\\0x00007DFF}
+	\wordbox{2}{Boot sector memory\\512B}
+\end{leftwordgroup}\\
+\begin{leftwordgroup}{0x00007E00\\0x0007FFFF}
+	\wordbox{4}{Kernel continued / Free\\480.5KB}
+\end{leftwordgroup}\\
+\begin{leftwordgroup}{0x00080000\\0x000FFFFF}
+	\wordbox{4}{Reserved\\512KB}
+\end{leftwordgroup}\\
+\begin{leftwordgroup}{0x00100000\\0x00EFFFFF}
+	\wordbox{4}{Free\\14MB}
+\end{leftwordgroup}\\
+\begin{leftwordgroup}{0x00F00000\\0x00FFFFFF}
+	\wordbox{2}{ISA Memory Hole / Reserved\\1MB}
+\end{leftwordgroup}\\
+\begin{leftwordgroup}{0x01000000\\0xBFFFFFFF}
+	\wordbox{4}{Free\\Big space I didn't calculate}
+\end{leftwordgroup}\\
+\begin{leftwordgroup}{0xC0000000\\0xFFFFFFFF}
+	\wordbox{3}{Various / Reserved\\1GiB\\(May be free once mapped)}
+\end{leftwordgroup}\\
+\end{bytefield}
+
+\newpage
+\section{Fixed allocation memory locations}
+The follow memory locations are either defined as standard locations or have been chosen to reduce disk usage on allocating empty space.
+\begin{itemize}
+\item 0x00000000-0x00000050: IRQ
+\item 0x00000500-?: Stage 2 / Kernel start
+\item 0x00007E00-0x000081FF (1K): Floppy Drive Controller Read Write Buffer
+\item 0x00008200-0x000085FF (1K): File System Table
+\item 0x00008600-0x000087FF (512b): VESA Mode info 
+\item 0x00008800-0x000089FF (512b): VESA info 
+\item 0xA0000-0x000BFFFF: VGA Video memory
+
+\end{itemize}
+
+\end{document}

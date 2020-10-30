@@ -1,0 +1,297 @@
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019/Arch Linux) (preloaded format=pdflatex 2020.5.9)  8 JUN 2020 21:30
+entering extended mode
+ restricted \write18 enabled.
+ %&-line parsing enabled.
+**MemoryMap.tex
+(./MemoryMap.tex
+LaTeX2e <2019-10-01> patch level 1
+(/usr/share/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2019/08/27 v1.4j Standard LaTeX document class
+(/usr/share/texmf-dist/tex/latex/base/size10.clo
+File: size10.clo 2019/08/27 v1.4j Standard LaTeX file (size option)
+)
+\c@part=\count80
+\c@section=\count81
+\c@subsection=\count82
+\c@subsubsection=\count83
+\c@paragraph=\count84
+\c@subparagraph=\count85
+\c@figure=\count86
+\c@table=\count87
+\abovecaptionskip=\skip41
+\belowcaptionskip=\skip42
+\bibindent=\dimen102
+)
+(/usr/share/texmf-dist/tex/latex/base/inputenc.sty
+Package: inputenc 2018/08/11 v1.3c Input encoding file
+\inpenc@prehook=\toks14
+\inpenc@posthook=\toks15
+
+(/usr/share/texmf-dist/tex/latex/base/latin1.def
+File: latin1.def 2018/08/11 v1.3c Input encoding file
+))
+(/usr/share/texmf-dist/tex/latex/amsmath/amsmath.sty
+Package: amsmath 2019/04/01 v2.17c AMS math features
+\@mathmargin=\skip43
+
+For additional information on amsmath, use the `?' option.
+(/usr/share/texmf-dist/tex/latex/amsmath/amstext.sty
+Package: amstext 2000/06/29 v2.01 AMS text
+
+(/usr/share/texmf-dist/tex/latex/amsmath/amsgen.sty
+File: amsgen.sty 1999/11/30 v2.0 generic functions
+\@emptytoks=\toks16
+\ex@=\dimen103
+))
+(/usr/share/texmf-dist/tex/latex/amsmath/amsbsy.sty
+Package: amsbsy 1999/11/29 v1.2d Bold Symbols
+\pmbraise@=\dimen104
+)
+(/usr/share/texmf-dist/tex/latex/amsmath/amsopn.sty
+Package: amsopn 2016/03/08 v2.02 operator names
+)
+\inf@bad=\count88
+LaTeX Info: Redefining \frac on input line 227.
+\uproot@=\count89
+\leftroot@=\count90
+LaTeX Info: Redefining \overline on input line 389.
+\classnum@=\count91
+\DOTSCASE@=\count92
+LaTeX Info: Redefining \ldots on input line 486.
+LaTeX Info: Redefining \dots on input line 489.
+LaTeX Info: Redefining \cdots on input line 610.
+\Mathstrutbox@=\box27
+\strutbox@=\box28
+\big@size=\dimen105
+LaTeX Font Info:    Redeclaring font encoding OML on input line 733.
+LaTeX Font Info:    Redeclaring font encoding OMS on input line 734.
+\macc@depth=\count93
+\c@MaxMatrixCols=\count94
+\dotsspace@=\muskip10
+\c@parentequation=\count95
+\dspbrk@lvl=\count96
+\tag@help=\toks17
+\row@=\count97
+\column@=\count98
+\maxfields@=\count99
+\andhelp@=\toks18
+\eqnshift@=\dimen106
+\alignsep@=\dimen107
+\tagshift@=\dimen108
+\tagwidth@=\dimen109
+\totwidth@=\dimen110
+\lineht@=\dimen111
+\@envbody=\toks19
+\multlinegap=\skip44
+\multlinetaggap=\skip45
+\mathdisplay@stack=\toks20
+LaTeX Info: Redefining \[ on input line 2855.
+LaTeX Info: Redefining \] on input line 2856.
+)
+(/usr/share/texmf-dist/tex/latex/amsfonts/amsfonts.sty
+Package: amsfonts 2013/01/14 v3.01 Basic AMSFonts support
+\symAMSa=\mathgroup4
+\symAMSb=\mathgroup5
+LaTeX Font Info:    Redeclaring math symbol \hbar on input line 98.
+LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
+(Font)                  U/euf/m/n --> U/euf/b/n on input line 106.
+)
+(/usr/share/texmf-dist/tex/latex/amsfonts/amssymb.sty
+Package: amssymb 2013/01/14 v3.01 AMS font symbols
+) (./bytefield.sty
+Package: bytefield 2017/09/15 v2.4 Network protocol diagrams
+
+(/usr/share/texmf-dist/tex/latex/tools/calc.sty
+Package: calc 2017/05/25 v4.3 Infix arithmetic (KKT,FJ)
+\calc@Acount=\count100
+\calc@Bcount=\count101
+\calc@Adimen=\dimen112
+\calc@Bdimen=\dimen113
+\calc@Askip=\skip46
+\calc@Bskip=\skip47
+LaTeX Info: Redefining \setlength on input line 80.
+LaTeX Info: Redefining \addtolength on input line 81.
+\calc@Ccount=\count102
+\calc@Cskip=\skip48
+)
+(/usr/share/texmf-dist/tex/latex/graphics/keyval.sty
+Package: keyval 2014/10/28 v1.15 key=value parser (DPC)
+\KV@toks@=\toks21
+)
+\bytefield@height=\skip49
+\bytefield@height@increment=\skip50
+\entire@bytefield@picture=\box29
+\bf@bitwidth=\skip51
+\bf@bitheight=\skip52
+\units@wide=\skip53
+\units@tall=\skip54
+\units@high=\skip55
+\header@xpos=\skip56
+\c@header@val=\count103
+\c@max@header@val=\count104
+\curly@box=\box30
+\wordlabelr@start=\skip57
+\wordlabelr@end=\skip58
+\wordlabell@start=\skip59
+\wordlabell@end=\skip60
+\total@lbox@width=\skip61
+\label@box@width=\skip62
+\label@box@height=\skip63
+\word@label@box=\box31
+) (./MemoryMap.aux)
+\openout1 = `MemoryMap.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 12.
+LaTeX Font Info:    ... okay on input line 12.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 12.
+LaTeX Font Info:    ... okay on input line 12.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 12.
+LaTeX Font Info:    ... okay on input line 12.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 12.
+LaTeX Font Info:    ... okay on input line 12.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 12.
+LaTeX Font Info:    ... okay on input line 12.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 12.
+LaTeX Font Info:    ... okay on input line 12.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 15.
+
+
+(/usr/share/texmf-dist/tex/latex/amsfonts/umsa.fd
+File: umsa.fd 2013/01/14 v3.01 AMS symbols A
+)
+LaTeX Font Info:    Trying to load font information for U+msb on input line 15.
+
+
+(/usr/share/texmf-dist/tex/latex/amsfonts/umsb.fd
+File: umsb.fd 2013/01/14 v3.01 AMS symbols B
+)
+\curly@height=\dimen114
+\half@curly@height=\dimen115
+\curly@shift=\dimen116
+\height=\dimen117
+\depth=\dimen118
+\totalheight=\dimen119
+\width=\dimen120
+\starting@point=\dimen121
+\curly@height=\dimen122
+\half@curly@height=\dimen123
+\curly@shift=\dimen124
+\curly@height=\dimen125
+\half@curly@height=\dimen126
+\curly@shift=\dimen127
+\height=\dimen128
+\depth=\dimen129
+\totalheight=\dimen130
+\width=\dimen131
+\starting@point=\dimen132
+\curly@height=\dimen133
+\half@curly@height=\dimen134
+\curly@shift=\dimen135
+\curly@height=\dimen136
+\half@curly@height=\dimen137
+\curly@shift=\dimen138
+\height=\dimen139
+\depth=\dimen140
+\totalheight=\dimen141
+\width=\dimen142
+\starting@point=\dimen143
+\curly@height=\dimen144
+\half@curly@height=\dimen145
+\curly@shift=\dimen146
+\curly@height=\dimen147
+\half@curly@height=\dimen148
+\curly@shift=\dimen149
+\height=\dimen150
+\depth=\dimen151
+\totalheight=\dimen152
+\width=\dimen153
+\starting@point=\dimen154
+\curly@height=\dimen155
+\half@curly@height=\dimen156
+\curly@shift=\dimen157
+\curly@height=\dimen158
+\half@curly@height=\dimen159
+\curly@shift=\dimen160
+\height=\dimen161
+\depth=\dimen162
+\totalheight=\dimen163
+\width=\dimen164
+\starting@point=\dimen165
+\curly@height=\dimen166
+\half@curly@height=\dimen167
+\curly@shift=\dimen168
+\curly@height=\dimen169
+\half@curly@height=\dimen170
+\curly@shift=\dimen171
+\height=\dimen172
+\depth=\dimen173
+\totalheight=\dimen174
+\width=\dimen175
+\starting@point=\dimen176
+\curly@height=\dimen177
+\half@curly@height=\dimen178
+\curly@shift=\dimen179
+\curly@height=\dimen180
+\half@curly@height=\dimen181
+\curly@shift=\dimen182
+\height=\dimen183
+\depth=\dimen184
+\totalheight=\dimen185
+\width=\dimen186
+\starting@point=\dimen187
+\curly@height=\dimen188
+\half@curly@height=\dimen189
+\curly@shift=\dimen190
+\curly@height=\dimen191
+\half@curly@height=\dimen192
+\curly@shift=\dimen193
+\height=\dimen194
+\depth=\dimen195
+\totalheight=\dimen196
+\width=\dimen197
+\starting@point=\dimen198
+\curly@height=\dimen199
+\half@curly@height=\dimen256
+\curly@shift=\dimen257
+\curly@height=\dimen258
+\half@curly@height=\dimen259
+\curly@shift=\dimen260
+\height=\dimen261
+\depth=\dimen262
+\totalheight=\dimen263
+\width=\dimen264
+\starting@point=\dimen265
+\curly@height=\dimen266
+\half@curly@height=\dimen267
+\curly@shift=\dimen268
+ [1
+
+{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}]
+LaTeX Font Info:    Trying to load font information for OMS+cmr on input line 4
+8.
+ (/usr/share/texmf-dist/tex/latex/base/omscmr.fd
+File: omscmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
+)
+LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 48.
+
+[2] (./MemoryMap.aux) ) 
+Here is how much of TeX's memory you used:
+ 1695 strings out of 492167
+ 19704 string characters out of 6131559
+ 94908 words of memory out of 5000000
+ 6085 multiletter control sequences out of 15000+600000
+ 5944 words of font info for 24 fonts, out of 8000000 for 9000
+ 1141 hyphenation exceptions out of 8191
+ 30i,11n,27p,226b,267s stack positions out of 5000i,500n,10000p,200000b,80000s
+</usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cm
+bx12.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr
+/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texmf-di
+st/fonts/type1/public/amsfonts/cm/cmsy10.pfb>
+Output written on MemoryMap.pdf (2 pages, 49553 bytes).
+PDF statistics:
+ 27 PDF objects out of 1000 (max. 8388607)
+ 18 compressed objects within 1 object stream
+ 0 named destinations out of 1000 (max. 500000)
+ 1 words of extra memory for PDF output out of 10000 (max. 10000000)
+

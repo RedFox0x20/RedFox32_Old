@@ -1,0 +1,7 @@
+FDC -> In a monotasking environment (Such as the one we have) it is reccomended
+to use PIO mode rather than Interrupts.
+
+Despite this I will use Interrupts as it is likely that in the future once a
+monotasking environment has been produced a multitasking environment can be
+implemented. Until that point it's considered a waste of cycles however it
+ultimately isn't going to be that big of an issue!
