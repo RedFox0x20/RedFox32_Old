@@ -1,7 +1,6 @@
 #include <Kernel/VGA.h>
 #include <Common/Syscalls.h>
 #include <Common/FDCInterface.h>
-#include <Common/Conversion.h>
 #include <Kernel/FileSystem.h>
 #include <Kernel/Int32.h>
 #include <Kernel/Memory.h>
@@ -44,9 +43,6 @@ void KMain()
 	puts(F->Descriptor.Name, 0x0B);
 	puts(F->Data, 0x0C);	
 	
-	char test[10];
-	itoa(test, 54321);
-	puts(test, 0x0D);
 	/* *Load a FileSystem ~ Almost there
 	 * *Load the drivers -- Use a dedicated file to identify drivers which will
 	 *  then be auto-loaded and initialized -- We are assuming that the device

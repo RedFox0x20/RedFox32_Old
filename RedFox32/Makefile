@@ -87,15 +87,13 @@ build_bootloader_stage2: $(BOOTLOADER_STAGE2_FILES)
 ./Build/Common/%.o : %.c
 ./Build/Kernel/%.o : %.c
 	@echo "Building $@"
-	$(CC) $(CCFLAGS) $(CCInclude) -I./Source -o $@ $<
+	$(CC) $(CCFLAGS) $(CCInclude) -o $@ $<
 
 KERNEL_FILES:=$(addsuffix .o,\
 	$(basename $(patsubst ./Source%, ./Build%,\
 	$(wildcard ./Source/Kernel/*.c) $(wildcard ./Source/Kernel/*.asm\
-)))) $(addsuffix .o,\
-	$(basename $(patsubst ./Source, ./Build%,\
-	$(wildcard ./Source/Common/*.c) $(wildcard ./Source/Common/*.asm\
-	))))
+))))
+
 build_kernel: $(KERNEL_FILES)
 	@echo "Linking kernel"
 	$(LD) -TLinkerScripts/Kernel.ld -o ./Build/Kernel/Kernel.kernel $(KERNEL_FILES)
