@@ -1,0 +1,17 @@
+Booting process
+===============
+
+[0x7C00] Bootloader Stage 1
+- Contain a FAT Header so the disk is named and recogniseable
+- Identify that the system has started booting correctly
+- Load the next stage
+- Jump to the loaded Code to [0x0500]
+
+[0x0500] Bootloader Stage 2
+- (Other setup stuff may need to happen, this will be identified during the
+  research stages)
+- Define and load the GDT
+- Deal with Segments
+- Enable the A20 Addressing line
+- Switch to Protected Mode
+- Jump into the C Kernel

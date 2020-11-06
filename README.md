@@ -22,8 +22,8 @@ Get other updates about projects from here:
 - [WEB](https://redfox32.xyz)
 ## Documentation
 - Want to get started on your own OS project, here's a guide on what to expect with code samples of my solution to the problem, you can even follow the guide like a tutorial! [RedFox32 OS Development Guide](Documentation/RedFox32DevelopersGuide.pdf)
-- Or how about developing an application for the RedFox32 project: [RedFox32 Software Development guide](Documentation/RedFox32SoftwareDevelopmentGuide.pdf)
-- Maybe you want to make a driver? [RedFox32 Driver Development Guide](Documentation/RedFox32DriverDevelopmentGuide)
+- Or how about developing an application for the RedFox32 project: [RedFox32 Software Development guide](RedFox32/Documentation/RedFox32SoftwareDevelopmentGuide.pdf)
+- Maybe you want to make a driver? [RedFox32 Driver Development Guide](RedFox32/Documentation/RedFox32DriverDevelopmentGuide)
 
 ## Requirements
 If you want to run this on physical hardware, you're in luck! I have designed for physical hardware so everything will be taken into account! Wow! However, there are some requirements, you will have to boot from a Floppy Drive... Yes, a floppy drive!
