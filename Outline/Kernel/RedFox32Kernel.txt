@@ -1,0 +1,30 @@
+The RedFox32 Kernel
+===================
+The kernel for RedFox32 will be a loose cross between the monolithic kernel and
+a modular kernel similar to the way most modern kernels operate. This will be
+done as simplification for the development process, it is recognised that this
+introduces problems for making changes in software as if a module changes, it
+may change the way software and the kernel interacts with it, however these
+problems are avoidable by providing standard functionality across module types
+and their requirements.
+
+RedFox32 will be a monotasking system due to the limited hardware that the
+system is designed for. The system should also be respectful of potential future
+design changes to allow for a transition into a more advanced multiprocessing
+system. MS-DOS provides functionality which could be interpreted as a form of
+"multi-processing/IPC" using Terminate and Stay Resident programs, their memory
+remains in place and is kept in a used state allowing for devices to continue to
+communicate with the code as if it were a running application, this could be
+done in situations such as drivers which provide a function and translation for
+other software to use I.E. disk access. We could use a similar format within our
+kernel. Being a user software the kernel also wouldn't know what was actually
+there, this could be useful for future development for controlling additional
+hardware devices.
+
+The Kernel will implement the following features:
+- Memory management
+- Simple drivers/Abstraction layers
+	- Keyboard 
+	- Floppy 
+	- VESA
+- A simple filesystem

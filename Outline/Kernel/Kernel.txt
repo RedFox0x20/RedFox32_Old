@@ -1,0 +1,78 @@
+Kernel
+======
+Designing a kernel:
+	- Monolithic kernels
+	- Micro-kernels
+	- Exo-kernels
+	- Modular kernels
+
+Monolithic kernels:
+- Monolithic kernels follow a design where all software talks to the kernel and
+  the kernel will provide the interface with hardware.
+- The kernel is responsible for handling all of the interrupt services.
+- The kernel is much larger, but has complete control, however because there is
+  lots of code running within the kernel it could be harder to debug and be
+  error prone.
+- Drivers are loaded into the kernel space and as such the supported hardware is
+  only that which the kernel has supported, additionally this creates a scenario
+  where even if the driver is not needed, it will be loaded.
+- Linux, Windows 9x, Mac OS <= 8.6, BSD and Xv6 are considered to be monolithic
+  kernsl. The ammendment here is that in cases such as linux, the drivers are
+  "seperate packages" however they are also kernel "modules" which are
+  dynamically loaded into the kernel space.
+
+Micro-kernels:
+- Micro-kernels create seperation betweeen, hardware and software. To do this
+  they use daemons which can be created to communicate between software and
+  hardware. The kernel will still be able to communicate with hardware as there
+  is always a need for built in drivers to allow the addition of daemons, which
+  can then take control. There is also the ability for
+  Inter-Process-Communcation protocols. Daemons are still required to
+  communicate with the kernel as there are systems such as memory management.
+- The use of daemons provides some performance benefits, in particular on
+  multi-core/multi-cpu systems as the kernel can better distribute processes so
+  that intense processes such as networking and filesystems don't reduce
+  performance of other processes. However this requires many instances of
+  context switching which if an error where to occour could cause data loss and
+  instability. It is possible to put additional systems in place to avoid data
+  loss however they may not always work.
+
+Exo-kernels:
+- Exokernels are unique in that the kernel does not care about how software
+  interacts with the system, it only implements certain security features and an
+  abstract interface as to how the software should interact with the hardware,
+  this interface can be overwritten. Effectively creating a core kernel with a
+  library layer which is used by software but can be ignored if desired. The
+  idea of a libOS could be useful for features such as cross system support for
+  applications which only support a certain OS I.E. The capability to run,
+  Windows, Mac and Linux binaries on a single system. However because it is
+  library based there could be inconsistencies across each system depending on
+  their implementation of the library interfaces.
+- Removes fixed abstraction requirements, however can lead to inconsistencies.
+- The idea of an exo-kernel is not completely developed, therefore not the most
+  suitable for creation of a stable system, however they can be good for testing
+  low level design features such as those used in paging.
+
+ Modular Kernels:
+- Modular kernels aim to further the idea of extensibility and hardware
+  support through the use of both internal, kernel drivers and third party
+  drivers.
+- This ability to define elements of the kernel as modules allows the primary
+  kernel to be loaded with all of the necessary components, the kernel itself
+  can then load in the required modules at run time. The kernel only cares about
+  getting the system to a stable state and requiring exactly the bare minimum to
+  run.
+- Modules being loadable at run time allows for on the fly driver installation
+  for given hardware, this behaviour is visible within systems such as Linux.
+- By modulating the goal may vary to:
+	- Only load a driver if a device requires it
+	- Only load implementations such as a filesystem if it is requested
+	- Only load code for a module policy when it should be evaluated
+	- And more...
+- The use of modules can be used to decrease boot times of a system, however
+  this speed from a users perspective could be negligible depending on what the
+  module is being used for.
+- Modules could also introduce problems such as instability, especially in cases
+  where multiple modules may overlap and be interacting with the same piece of
+  hardware but be using it for different functionality in parallel, effectively
+  causing "interference" with one another which could cause fatal errors.
