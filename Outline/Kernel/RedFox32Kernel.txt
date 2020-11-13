@@ -25,6 +25,6 @@ The Kernel will implement the following features:
 - Memory management
 - Simple drivers/Abstraction layers
 	- Keyboard 
-	- Floppy 
+	- Floppy
 	- VESA
 - A simple filesystem
