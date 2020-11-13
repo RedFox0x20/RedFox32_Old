@@ -1,4 +1,5 @@
 # RedFox32.xyz
+### I overhaul a lot of the system often as I learn, this is going to happen soon!
 ## What is this, where am I?
 RedFox32 is a hobby OS project that I am using to learn the ins and outs of the x86 Architecture in addition to helping developers (like you, perhaps) begin their own adventure into the world of bare-metal programming.
 ![Image of the running OS](Img/FontRenderingAndKeyboardInput.png  "Nothing to see here!")

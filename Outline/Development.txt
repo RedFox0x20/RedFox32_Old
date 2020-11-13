@@ -13,6 +13,11 @@ Understanding the development environment
 	- Outline: Contains research documents and notes for future reference.
 	
 	- RedFox32: Contains the primary components of the OS
+		
+		- Build: All object files should be output here, if this directory
+		  exists when cloned then something has not been ignored, this should
+		  not happen and a file could be in the wrong place. [make clean]
+
 		- Source: All OS source code will be contained here
 		
 		- LinkerScripts: To build binary files some changes need making during
