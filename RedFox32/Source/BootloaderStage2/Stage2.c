@@ -19,6 +19,6 @@ int Stage2_CEntry(void)
 	 * bypass this limitation using the BIOS functions by performing all our
 	 * loading in the pre 32 bit Assembly code.
 	 */
-	puts("Entered C-Code!\n", VGA_COLOUR_GREEN);
+	while (1) puts("Entered C-Code!\n", VGA_COLOUR_GREEN);
 	return 0;
 }
