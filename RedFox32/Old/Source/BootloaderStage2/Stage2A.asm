@@ -1,21 +1,20 @@
-;******************************************************************************
+;************************************
 ; KEntry.asm
 ; Initialize the system and begin to
 ; enter into the main 32 bit kernel
-;******************************************************************************
+;************************************
 [BITS 16]		; The first set of code is in 16 bit mode as we have yet
 				; to switch over to Protected Mode. Some of the following code
-; does.
+				; does.
 section .text	; All of this code is in the .text section
 jmp	0x00:Stage2	; Jump over data to Stage 2 code, ensuring to set registers to
-				; 0x00 implicitly (This should be done already, it's just a
-				; precaution)
+				; 0x00 implicitly
 
-;******************************************************************************
+;*******************************************
 ; Global Descriptor Table (GDT)
-;******************************************************************************
-; Creates a flat style memory layout
-;******************************************************************************
+;*******************************************
+; I forgot where I got this GDT from, all I know is it works the way I want
+; it too... I should definately take another look at what is going on here!
 gdt_data: 
 dq 0							; null descriptor
 
@@ -87,16 +86,16 @@ mov	cr0, eax	; Set cr0
 ; Jump to the 32bit code
 jmp	0x08:Stage232 ; far jump to fix CS. Remember that the code selector is 0x8!
 
-;******************************************************************************
-; This is where all the 32 bit code will happen, this will do further setup and
-; perform the switch into C code, the switch to the Kernel will happen from
-; within the C code
-;******************************************************************************
-[BITS 32] 				; Welcome to the 32 bit world!
+
+[BITS 32] 	; Welcome to the 32 bit world!
+			; All code from this point will be compiled in 32 bit operations
 [EXTERN Stage2_CEntry]	; We can now link to C code so we need to reference to
 						; the linker that we want to access the Stage2_CEntry
 						; symbol
-[EXTERN puts]			; Same again for puts
+[EXTERN puts]			; Same again for the puts function
+						;
+section .text			; This code will also be found in the "text" section
+						;
 Stage232:				; Stage2 32 bit label
 
 ; Initialize the segment registers
@@ -105,7 +104,7 @@ mov ds, ax		; DS = 0x10
 mov es, ax		; ES = 0x10
 mov fs, ax		; FS = 0x10
 mov gs, ax		; GS = 0x10
-mov ss, ax		; SS = 0x10 as per GDT
+mov ss, ax			; SS = 0x10 as per GDT
 
 ; Setup the stack (Ensure that there's no incorrect bits in high)
 ; The stack is set to be the memory region: 0x9000-0xb8000
@@ -122,7 +121,7 @@ call Stage2_CEntry
 push 0x0C					; Colour
 push EnteringStopLoopStr	; String
 call puts					; Call to the c function:
-; puts(char *str, char colour);
+							; puts(char *str, char colour);
 
 ; This would be where a system shutdown would take place however this works
 ; to just halt the system once the C-Code returns, if at all.
@@ -181,6 +180,6 @@ in      al,0x64		; Read from port 0x64
 test    al,1		; Compare the value with 1
 jz      a20wait2	; If the value is 0 repeat
 ret					; Else we're returning to the caller within the EnableA20
-; function
+					; function
 
 

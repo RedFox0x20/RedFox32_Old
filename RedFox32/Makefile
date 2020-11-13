@@ -1,12 +1,10 @@
-.PHONY: build debug run Filesystem
+.PHONY: build debug run 
 
 # Source directories
 VPATH:=./Source\
 	:./Source/BootloaderStage1\
 	:./Source/BootloaderStage2\
-	:./Source/Kernel\
-	:./Source/Drivers\
-	:./Source/Common
+	:./Source/Kernel
 
 # Compilers and compiler arguments
 AS:=nasm
@@ -22,11 +20,9 @@ DISK_IMAGE_FILE:=./Build/Floppy.img
 BUILD_DIRECTORIES:=./Build \
 	./Build/BootloaderStage1 \
 	./Build/BootloaderStage2 \
-	./Build/Kernel \
-	./Build/Drivers \
-	./Build/Common
+	./Build/Kernel
 
-build: build_bootloader build_kernel Filesystem
+build: build_bootloader 
 
 floppy: build floppy_image
 
@@ -81,26 +77,6 @@ build_bootloader_stage2: $(BOOTLOADER_STAGE2_FILES)
 		-TLinkerScripts/Stage2Linker.ld \
 		-o ./Build/BootloaderStage2/Stage2.boot \
 		$(BOOTLOADER_STAGE2_FILES)
-
-
-# Kernel
-./Build/Common/%.o : %.c
-./Build/Kernel/%.o : %.c
-	@echo "Building $@"
-	$(CC) $(CCFLAGS) $(CCInclude) -o $@ $<
-
-KERNEL_FILES:=$(addsuffix .o,\
-	$(basename $(patsubst ./Source%, ./Build%,\
-	$(wildcard ./Source/Kernel/*.c) $(wildcard ./Source/Kernel/*.asm\
-))))
-
-build_kernel: $(KERNEL_FILES)
-	@echo "Linking kernel"
-	$(LD) -TLinkerScripts/Kernel.ld -o ./Build/Kernel/Kernel.kernel $(KERNEL_FILES)
-
-Filesystem:
-	nasm -fbin Source/Filesystem/FSRoot.asm -o Build/FSRootDir.bin
-	nasm -fbin Source/Filesystem/SectorMap.asm -o Build/FSSectorMap.bin
 
 # Generate a floppy image
 floppy_image: build

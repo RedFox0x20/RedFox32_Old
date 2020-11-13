@@ -6,6 +6,7 @@ dd if=/dev/zero \
 	bs=512 \
 	count=2880
 
+
 echo "Writing stage1"
 dd if=./Build/BootloaderStage1/Bootloader.o \
 	of=$DISK_IMAGE_FILE \
@@ -13,29 +14,20 @@ dd if=./Build/BootloaderStage1/Bootloader.o \
 	seek=0 \
 	conv=notrunc
 
-echo "Writing stage2"
+[[ -f ./Build/BootloaderStage2/Stage2.boot ]] && \
+echo "Writing stage2" && \
 dd if=./Build/BootloaderStage2/Stage2.boot \
 	of=$DISK_IMAGE_FILE \
 	bs=512 \
 	seek=3 \
 	conv=notrunc
 
+[[ -f ./Build/Kernel/Kernel.kernel ]] && \
+echo "Writing kernel" &&
 dd if=./Build/Kernel/Kernel.kernel \
 	of=$DISK_IMAGE_FILE \
 	bs=512 \
 	seek=18 \
 	conv=notrunc
-
-dd if=./Build/FSRootDir.bin \
-	of=$DISK_IMAGE_FILE \
-	bs=512 \
-	seek=1 \
-	conv=notrunc
-
-dd if=./Build/FSSectorMap.bin \
-		of=$DISK_IMAGE_FILE \
-		bs=512 \
-		seek=2 \
-		conv=notrunc
 
 echo "Floppy created $DISK_IMAGE_FILE"
