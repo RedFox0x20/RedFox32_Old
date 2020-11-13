@@ -1,0 +1,30 @@
+Development
+===========
+
+Understanding the development environment
+- File structure
+	- Documentation: Contains final documentation regarding OS operation and
+	  design. This may include documentation such as guides for writing an OS,
+	  the stages involved and other items such as driver implementation methods.
+
+	- Img: Contain reference images for markdown documents in addition to images
+	  of the system in operation.
+
+	- Outline: Contains research documents and notes for future reference.
+	
+	- RedFox32: Contains the primary components of the OS
+		- Source: All OS source code will be contained here
+		
+		- LinkerScripts: To build binary files some changes need making during
+		  the linker stage, where necessary a linker script can be made and
+		  stored here
+		
+		- Old: This directory should be removed eventually once the outdated
+		  material is no longer relevant.
+		
+		* DiskBuilder.sh: A generic script that makes producing the final floppy
+		  image just that little bit easier.
+
+		* Makefile: The make build system is used within the project. The
+		  Makefile contains all the rules associated with efficiently building
+		  the OS.
