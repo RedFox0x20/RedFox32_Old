@@ -29,7 +29,7 @@ Get other updates about projects from here:
 ## Requirements
 If you want to run this on physical hardware, you're in luck! I have designed for physical hardware so everything will be taken into account! Wow! However, there are some requirements, you will have to boot from a Floppy Drive... Yes, a floppy drive!
 
-Can't meat that requirement? Not to worry just run `make run` and you'll be dropped into a QEMU virtual machine running just fine. How about Virtual Box and other software? Sure why not, give it a go, there will be small things every now and then that I may need to change to properly build for them however they're not the main target.
+Can't meet that requirement? Not to worry just run `make run` and you'll be dropped into a QEMU virtual machine running just fine. How about Virtual Box and other software? Sure why not, give it a go, there will be small things every now and then that I may need to change to properly build for them however they're not the main target.
 
 ## Building
 We target x86 (32 bit) CPUs as such we need to be able to compile 32bit code! To install the required packages you may need to enable multilib packages for your architecture.
