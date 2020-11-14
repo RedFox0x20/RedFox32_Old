@@ -1,6 +1,0 @@
-#ifndef BOOTLOADER_STAGE2_STAGE2
-#define BOOTLOADER_STAGE2_STAGE2
-
-#define KERNEL_POSITION ((void*)0x2200)
-
-#endif

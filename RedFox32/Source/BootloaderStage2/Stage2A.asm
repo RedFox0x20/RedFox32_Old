@@ -5,11 +5,12 @@
 ;******************************************************************************
 [BITS 16]		; The first set of code is in 16 bit mode as we have yet
 				; to switch over to Protected Mode. Some of the following code
-; does.
-section .text	; All of this code is in the .text section
+				; does.
 jmp	0x00:Stage2	; Jump over data to Stage 2 code, ensuring to set registers to
 				; 0x00 implicitly (This should be done already, it's just a
 				; precaution)
+
+BootDevice: db 0
 
 ;******************************************************************************
 ; Global Descriptor Table (GDT)
@@ -43,7 +44,7 @@ dd gdt_data						; base of GDT
 EnteringStopLoopStr: db "C has exited, halting system!", 0
 
 Stage2:
-
+mov byte [BootDevice], dl
 ; Enter a known video mode, 80 columns
 mov ax, 0x0003	; Mode 3, 80 column mode, 16 colour
 int 0x10		; Call the 0x10 BIOS interrupt
@@ -59,6 +60,9 @@ mov al, '2'		; Character value of 2 (2 | 0x30)
 xor bx, bx		; Screen 0
 int 0x10		; Call the 0x10 BIOS interrupt
 
+; Let's load the kernel
+call LoadKernel
+
 ; Set segment registers
 cli				; Safety first! Disable interrupts.
 xor	ax, ax		; Zero AX so we can zero the segment registers
@@ -67,9 +71,17 @@ mov	es, ax		; ES = 0x00
 mov	ax, 0x9000	; Set AX to the stack base. The stack begins at 0x9000-0xffff
 mov	ss, ax		; Set the Stack base register to 0x9000 (AX);
 mov	sp, 0xFFFF	; Set the End of the stack to 0xFFFF
+sti
+
+
+mov ah, 0x0E
+mov al, 'K'
+xor bx, bx
+int 0x10
 
 ; Loading the Global Descriptor Table
 ; Interrupts are still disabled from setting the registers
+cli
 lgdt [end_of_gdt] 	; Load the GDT
 sti					; Enable interrupts so we can use BIOS interrupts 0x10
 
@@ -83,9 +95,65 @@ cli				; Turn interrupts off again
 mov	eax, cr0	; Get the value of the cr0 register
 or	eax, 1		; Set the PE mode bit
 mov	cr0, eax	; Set cr0
-
+	
+	
 ; Jump to the 32bit code
 jmp	0x08:Stage232 ; far jump to fix CS. Remember that the code selector is 0x8!
+
+; Load kernel
+LoadKernel:
+	jmp .Loop
+	nop
+	.Address: dw 0x2900
+	.CylinderCount: db 1
+	.Head: db 0
+	.Cylinder: db 1 
+	nop
+	.Loop:
+		mov ah, 0x0E
+		mov al, 'L'
+		xor bx, bx
+		int 0x10
+
+		mov cx, 2
+		mov al, byte [.Cylinder]
+		mov ah, 0
+		div cx
+		cmp dx, 0
+		jne .One
+		mov byte [.Head], 0
+		jmp .Load
+		.One:
+		mov byte [.Head], 1
+
+		.Load:
+		mov ah, 0x02
+		mov al, 18,
+		mov bx, word [.Address]
+		mov ch, byte [.Cylinder]
+		mov cl, 1 
+		mov dh, byte [.Head]
+		mov dl, byte [BootDevice]
+		int 0x13
+		jc .Load
+		cmp al, 18
+		jne .Load
+		
+		mov ax, word [.Address]
+		add ax, 0x2400
+		mov word [.Address], ax
+
+		mov al, byte [.Cylinder]
+		inc al
+		mov byte [.Cylinder], al
+
+		mov al, byte [.CylinderCount]
+		dec al
+		mov byte [.CylinderCount], al
+		cmp al, 0
+		jne .Loop
+	.Done:
+	ret
 
 ;******************************************************************************
 ; This is where all the 32 bit code will happen, this will do further setup and
@@ -108,9 +176,9 @@ mov gs, ax		; GS = 0x10
 mov ss, ax		; SS = 0x10 as per GDT
 
 ; Setup the stack (Ensure that there's no incorrect bits in high)
-; The stack is set to be the memory region: 0x9000-0xb8000
+; Need to figure out an appropriate stack size :)
 mov ebp, 0x9000		; Set the base pointer
-mov esp, 0xFFFF		; Set the top of the stack to b8000
+mov esp, 0xFFFF		; Set the top of the stack to 
 
 ; Enable the A20 addressing line
 call EnableA20
@@ -182,5 +250,4 @@ test    al,1		; Compare the value with 1
 jz      a20wait2	; If the value is 0 repeat
 ret					; Else we're returning to the caller within the EnableA20
 ; function
-
 
