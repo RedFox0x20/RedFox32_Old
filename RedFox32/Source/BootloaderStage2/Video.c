@@ -8,6 +8,8 @@ void ScrollScreen(unsigned char Lines)
 		*WritePos = (unsigned char *)VIDEO_MEMORY,
 		*ReadPos = (unsigned char *)(VIDEO_MEMORY + VGA_XRESOLUTION * Lines);
 
+	/* There is probably a better way to do this...
+	 */
 	while (ReadPos != (unsigned char *)(VIDEO_MEMORY + VGA_MEMORY_SIZE))
 	{
 		*WritePos = *ReadPos;
@@ -21,10 +23,6 @@ void putch(char ch, char colour)
 	// Ensure we stick within our bounds
 	if (ScreenPos >= VGA_MEMORY_SIZE)
 	{
-		/* Clear the VRAM
-		 * This should probably be replaced with a scrolling effect at some
-		 * point, for now just clear to black.
-		 */
 		ScrollScreen(1);
 		ScreenPos -= VGA_XRESOLUTION;
 	}
