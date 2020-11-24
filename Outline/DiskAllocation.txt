@@ -1,0 +1,15 @@
+Disk Allocation
+===============
+
+BOOT SECT: [ 1 cylinder, 18 sectors, bootloader and system structures ]
+KERN CYLS: [ n cylinder(s), 18*n sectors, kernel					  ]
+USER CYLS: [ Remaining cylinders will be used for user files		  ]
+
+BOOT CYL Map
+=============
+[ 1 Sector, boot stage 1  ]
+[ n Sectors, boot stage 2 ] < Maximum 15 sectors
+[ 1 Sector, FS Sector map ]
+[ 1 Sector, FS Root Table ]
+
+

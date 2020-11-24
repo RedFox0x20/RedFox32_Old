@@ -18,7 +18,7 @@ void ScrollScreen(unsigned char Lines)
 	}
 }
 
-void putch(char ch, char colour)
+void putch(char ch, char Colour)
 {
 	// Ensure we stick within our bounds
 	if (ScreenPos >= VGA_MEMORY_SIZE)
@@ -33,14 +33,14 @@ void putch(char ch, char colour)
 		return;
 	}
 	VIDEO_MEMORY[ScreenPos++] = ch;
-	VIDEO_MEMORY[ScreenPos++] = colour;
+	VIDEO_MEMORY[ScreenPos++] = Colour;
 }
 
-void puts(char *str, char colour)
+void puts(char *str, char Colour)
 {
 	while (*str != 0)
 	{
-		putch(*str, colour);
+		putch(*str, Colour);
 		str++;
 	}
 }

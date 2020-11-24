@@ -1,0 +1,83 @@
+The following output is a standard memory map.
+According to wiki.osdev.org this is a standard memory layout
+used in BOCHS however it also seems to apply to QEMU.
+https://wiki.osdev.org/Detecting_Memory_(x86)#Getting_an_E820_Memory_Map
+=====================================================
+00008000:          6          0          0     654336
+00008010:          0          1          1     654336
+00008020:          0       1024          0          2
+00008030:          1     983040          0      65536
+00008040:          0          2          1    1048576
+00008050:          0  133038080          0          1
+00008060:          1  134086656          0     131072
+00008070:          0          2          1 4294705152
+00008080:          0     262144          0          2
+00008090:          1          0          0          0
+000080a0:          0          0          0          0
+000080b0:          0          0          0          0
+000080c0:          0          0          0          0
+=====================================================
+
+==
+Type 1 = Free
+Type 2 = Reserved
+==
+* If 0, it gets ignored by the mapping function, bit 0. Bit 1 determines if the
+  memory region is considered Non-Volatile.
+
+0x00000006
+6 Entries
+==1
+0x00000000|00000000 
+0x00000000|0009fc00 
+0x00000001
+*0x00000001
+
+0x0000000000000000 + 0x00000000 0009fc00
+Type 1
+Ignore? No
+==2
+0x00000000|0009fc00
+0x00000000|00000400
+0x00000002
+0x00000001
+
+0x00000000 0009fc00 + 0x00000000 00000400 
+Type 2
+Ignore? No
+==3
+0x000f0000|00000000
+0x00010000|00000000
+0x00000002
+0x00000001
+
+0x00000000 0x000f0000 + 0x00000000 0x00010000
+Type 2
+Ignore? No
+==4
+0x00000000|00100000
+0x00000000|07ee0000
+0x00000001
+0x00000001
+
+0x00100000 + 0x07ee0000
+Type 1
+Ignore? No
+==5
+0x00000000|07fe0000
+0x00000000|00020000
+0x00000002
+0x00000001
+
+0x07fe0000 + 0x00020000
+Type 2
+Ignore? No
+==6
+0x00000000|fffc0000
+0x00000000|00040000
+0x00000002
+0x00000001
+
+0xfffc0000 + 0x00040000
+Type 2
+Ignore? No

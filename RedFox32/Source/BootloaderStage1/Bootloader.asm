@@ -17,19 +17,13 @@ jmp Boot	; Jump over the data
 nop			; Add a nop for padding - This is a FAT thing however I am bringing
 			; this forward to my Filesystem
 
-; FILESYSTEM Data
-FSDiskName: db "REDFOX  "	; The name of the disk (Some form of UID would be
-							; useful too)
-FSRootDirectoryLBA: dw 1	; Where can we find the actual filesystem definition
-FSSectorMapLBA: dw 2		; Where can we find the sector mapping
-
 ; Data
-BootDevice: db 0	; We're going to reserve a single byte of data to be used to
+BootDevice: db 0xFF	; We're going to reserve a single byte of data to be used to
 					; store the ID of the boot device. According to most sources
 					; it is standard for the BIOS to leave the boot disk ID in
 					; the dl register after boot.
 Boot:
-    mov [BootDevice], dl	; Save the Boot Device ID into the location above
+    mov byte [BootDevice], dl	; Save the Boot Device ID into the location above
     
 	; Set segment registers to 0
     xor ax, ax	; Clear AX
@@ -42,7 +36,7 @@ Boot:
 ; resetting the boot device.
 Reset:
     xor ax, ax				; Clear AX
-    mov dl, [BootDevice]	; Load the BootDevice ID
+    mov dl, byte [BootDevice]	; Load the BootDevice ID
     int 0x13				; Call the BIOS 0x13 function
     jc Reset				; If the command failed try again.
 
@@ -56,14 +50,14 @@ Reset:
 ; BootloaderStage2 uses less than the sectors we have given it.
 LoadStage2:
     mov     ah, 0x02        	; 0x02 means to read from disk
-    mov     al, 14          	; read 16 sector at a time (Maximum as we start
+    mov     al, 16          	; read 16 sector at a time (Maximum as we start
 								; reading from 2 sectors in
     mov     bx, Stage2Location	; Set the Write position to the KernelLocation
 								; constant
     mov     ch, 0           	; sector 3 is still on track 1
-    mov     cl, 4           	; sector to read (second sector)
+    mov     cl, 2           	; sector to read (second sector)
     mov     dh, 0           	; head number
-    mov     dl, [BootDevice]	; drive 0 is floppy drive
+    mov     dl, byte [BootDevice]	; drive 0 is floppy drive
     int     0x13            	; read the
     jc Error					; In the event of an error jump to an error
 								; handling routine
@@ -75,7 +69,7 @@ LoadStage2:
     xor bx, bx		; Page 0
     int 0x10		; Call BIOS function 0x10
 
-
+	mov dl, byte [BootDevice]   ; A nice way to pass the BootDevice ID to S2
     jmp 0x0000:Stage2Location	; Jump to the KernelLocation ensuring that the
 								; segments are zeroed.
 

@@ -1,7 +1,6 @@
 ;******************************************************************************
 ; KEntry.asm
-; Initialize the system and begin to
-; enter into the main 32 bit kernel
+; Initialize the system 
 ;******************************************************************************
 [BITS 16]		; The first set of code is in 16 bit mode as we have yet
 				; to switch over to Protected Mode. Some of the following code
@@ -61,6 +60,7 @@ xor bx, bx		; Screen 0
 int 0x10		; Call the 0x10 BIOS interrupt
 
 ; Let's load the kernel
+
 call LoadKernel
 
 ; Set segment registers
@@ -71,31 +71,20 @@ mov	es, ax		; ES = 0x00
 mov	ax, 0x9000	; Set AX to the stack base. The stack begins at 0x9000-0xffff
 mov	ss, ax		; Set the Stack base register to 0x9000 (AX);
 mov	sp, 0xFFFF	; Set the End of the stack to 0xFFFF
+
 sti
-
-
-mov ah, 0x0E
-mov al, 'K'
-xor bx, bx
-int 0x10
+mov dword [0x8000], 0	; Set the number of entries to 0
+call CreateMemoryMap
+cli
 
 ; Loading the Global Descriptor Table
 ; Interrupts are still disabled from setting the registers
-cli
 lgdt [end_of_gdt] 	; Load the GDT
-sti					; Enable interrupts so we can use BIOS interrupts 0x10
-
-; Identify that we are about to switch to Protocted Mode
-mov ah, 0x0E	; TTY Print
-mov al, 'P'		; Char P
-int 0x10		; Call the 0x10 BIOS interrupt
 
 ; Switch to protected mode
-cli				; Turn interrupts off again
 mov	eax, cr0	; Get the value of the cr0 register
 or	eax, 1		; Set the PE mode bit
 mov	cr0, eax	; Set cr0
-	
 	
 ; Jump to the 32bit code
 jmp	0x08:Stage232 ; far jump to fix CS. Remember that the code selector is 0x8!
@@ -155,6 +144,62 @@ LoadKernel:
 	.Done:
 	ret
 
+; use the INT 0x15, eax= 0xE820 BIOS function to get a memory map
+; note: initially di is 0, be sure to set it to a value so that the BIOS code will not be overwritten. 
+;       The consequence of overwriting the BIOS code will lead to problems like getting stuck in `int 0x15`
+; inputs: es:di -> destination buffer for 24 byte entries
+; outputs: bp = entry count, trashes all registers except esi
+; CODE FROM:
+; https://wiki.osdev.org/Detecting_Memory_(x86)#Getting_an_E820_Memory_Map
+mmap_ent equ 0x8000             ; the number of entries will be stored at 0x8000
+; 0x8000 = uint32 num entries
+; 0x8004+ = Entries see mmap_qemu.txt
+CreateMemoryMap:
+    mov di, 0x8004          ; Set di to 0x8004. Otherwise this code will get stuck in `int 0x15` after some entries are fetched 
+	xor ebx, ebx		; ebx must be 0 to start
+	xor bp, bp		; keep an entry count in bp
+	mov edx, 0x0534D4150	; Place "SMAP" into edx
+	mov eax, 0xe820
+	mov [di + 20], dword 1	; force a valid ACPI 3.X entry
+	mov ecx, 24		; ask for 24 bytes
+	int 0x15
+	jc short .failed	; carry set on first call means "unsupported function"
+	mov edx, 0x0534D4150	; Some BIOSes apparently trash this register?
+	cmp eax, edx		; on success, eax must have been reset to "SMAP"
+	jne short .failed
+	test ebx, ebx		; ebx = 0 implies list is only 1 entry long (worthless)
+	je short .failed
+	jmp short .jmpin
+.e820lp:
+	mov eax, 0xe820		; eax, ecx get trashed on every int 0x15 call
+	mov [di + 20], dword 1	; force a valid ACPI 3.X entry
+	mov ecx, 24		; ask for 24 bytes again
+	int 0x15
+	jc short .e820f		; carry set means "end of list already reached"
+	mov edx, 0x0534D4150	; repair potentially trashed register
+.jmpin:
+	jcxz .skipent		; skip any 0 length entries
+	cmp cl, 20		; got a 24 byte ACPI 3.X response?
+	jbe short .notext
+	test byte [di + 20], 1	; if so: is the "ignore this data" bit clear?
+	je short .skipent
+.notext:
+	mov ecx, [di + 8]	; get lower uint32_t of memory region length
+	or ecx, [di + 12]	; "or" it with upper uint32_t to test for zero
+	jz .skipent		; if length uint64_t is 0, skip entry
+	inc bp			; got a good entry: ++count, move to next storage spot
+	add di, 24
+.skipent:
+	test ebx, ebx		; if ebx resets to 0, list is complete
+	jne short .e820lp
+.e820f:
+	mov [mmap_ent], bp	; store the entry count
+	clc			; there is "jc" on end of list to this point, so the carry must be cleared
+	ret
+.failed:
+	stc			; "function unsupported" error exit
+	ret
+
 ;******************************************************************************
 ; This is where all the 32 bit code will happen, this will do further setup and
 ; perform the switch into C code, the switch to the Kernel will happen from
@@ -199,16 +244,10 @@ cli			; Disable interrupts
 hlt			; Halt the CPU (Only interrupts can unhalt however we disabled them)
 jmp STOP32	; If we somehow to continue just lockup again.
 
-;---------------;
+;******************************************************************************
 ; Enable A20
-; - Disables interrupts
-; - Returns nothing, with interrupts disabled
-; - This allows us to create an interrupt table (See C code) and then reenable
-;   them without issues at a later date!
-; ----------- This code was copied from either a forum post or wiki.osdev.org
-; ----------- I would format this to match but the code squares are nice :P
+;******************************************************************************
 EnableA20:
-cli					; Absolutely ensure that interrupts are disabled
 
 call    a20wait		; Call to the a20wait function
 mov     al, 0xAD	; Set AL to 0xAD
@@ -248,6 +287,5 @@ a20wait2:			;
 in      al,0x64		; Read from port 0x64
 test    al,1		; Compare the value with 1
 jz      a20wait2	; If the value is 0 repeat
-ret					; Else we're returning to the caller within the EnableA20
-; function
+ret					; Else we're returning to the caller
 

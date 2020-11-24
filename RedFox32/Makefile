@@ -26,10 +26,10 @@ build: build_bootloader
 
 floppy: build floppy_image
 
-usb: floppy
-	@echo "Caution! Writing to /dev/sdb -- CTRL+C if you do not want this to happen!"
+usb: build
+	@echo "You are about to write to the /dev/sdb storage device... Continue? CTRL+C to cancel!"
 	@read
-	sudo dd if=$(DISK_IMAGE_FILE) of=/dev/sdb status=progress bs=512
+	DISK_IMAGE_FILE=/dev/sdb ./DiskBuilder.sh
 
 debug: floppy
 	qemu-system-i386 -fda $(DISK_IMAGE_FILE) -s -S --monitor stdio 
