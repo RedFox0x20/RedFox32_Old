@@ -11,12 +11,12 @@ void putch_hex(char c, char Colour)
 	char h = c >> 4;
 	h &= 0x0F;
 	h |= 0x30;
-	h = h > '9' ? h + 7 : h;
+	if (h > '9') { h += 7; }
 
 	char l = c;
 	l &= 0x0F;
 	l |= 0x30;
-	l = l > '9' ? l + 7 : l;
+	if (l > '9') { l += 7; }
 
 	putch(h, Colour);
 	putch(l, Colour);
