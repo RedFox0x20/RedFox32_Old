@@ -1,6 +1,12 @@
 #include <BootloaderStage2/Video.h>
 
-static volatile unsigned int ScreenPos = 0;
+static unsigned int ScreenPos = 0;
+
+void SetupVideo(void)
+{
+	ScreenPos = 0;
+}
+
 
 void ScrollScreen(unsigned char Lines)
 {
