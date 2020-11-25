@@ -54,7 +54,7 @@ xor bx, bx		; Screen 0
 int 0x10		; Call the 0x10 BIOS interrupt
 
 ; Let's load the kernel
-
+sti
 call LoadKernel
 
 ; Set segment registers
@@ -104,7 +104,7 @@ LoadKernel:
 	.Address: dw 0x2900
 	.CylinderCount: db 1
 	.Head: db 0
-	.Cylinder: db 1 
+	.Cylinder: dw 1 
 	nop
 	.Loop:
 		mov ah, 0x0E
@@ -124,14 +124,16 @@ LoadKernel:
 		mov byte [.Head], 1
 
 		.Load:
-		mov ah, 0x02
-		mov al, 18,
-		mov bx, word [.Address]
-		mov ch, byte [.Cylinder]
-		mov cl, 1 
-		mov dh, byte [.Head]
-		mov dl, byte [BootDevice]
-		int 0x13
+		mov ah, 0x02				; Read
+		mov al, 18,					; 18 sectors
+		mov bx, word [.Address]		; To address
+		mov cx, word [.Cylinder]	; Load the cylinder to cx
+		shl cx, 6					; Cylinder is only the top 10 bits
+		mov cl, 1 					; Always start with the first sector in the
+									; cylinder
+		mov dh, byte [.Head]		; From head side
+		mov dl, byte [BootDevice]	; From the boot device
+		int 0x13					; Read it
 		jc .Load
 		cmp al, 18
 		jne .Load
@@ -252,6 +254,8 @@ push 0x0C					; Colour
 push EnteringStopLoopStr	; String
 call puts					; Call to the c function:
 ; puts(char *str, char colour);
+
+call 0x2900
 
 ; This would be where a system shutdown would take place however this works
 ; to just halt the system once the C-Code returns, if at all.

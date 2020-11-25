@@ -22,9 +22,12 @@ there, this could be useful for future development for controlling additional
 hardware devices.
 
 The Kernel will implement the following features:
+- Interrupts
+	- IDT
+	- Syscalls
 - Memory management
 - Simple drivers/Abstraction layers
 	- Keyboard 
 	- Floppy
-	- VESA
+	- VGA and/or VESA
 - A simple filesystem

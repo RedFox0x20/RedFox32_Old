@@ -22,8 +22,7 @@ BUILD_DIRECTORIES:=./Build \
 	./Build/BootloaderStage2 \
 	./Build/Kernel
 
-build: build_bootloader 
-
+build: build_bootloader build_kernel
 floppy: build floppy_image
 
 usb: build
@@ -45,7 +44,7 @@ clean:
 
 
 # Generic rule for C files
-./Build/BootloaderStage2/%.o: %.c
+./Build/BootloaderStage2/%.o ./Build/Kernel/%.o: %.c
 	@echo "Building $@"
 	$(CC) $(CCFLAGS) $(CCInclude) -o $@ $<
 
@@ -55,7 +54,7 @@ clean:
 	$(AS) -felf32 $< -o $@
 
 # Bootloader
-build_bootloader: build_bootloader_stage1 build_bootloader_stage2
+build_bootloader: build_bootloader_stage1 build_bootloader_stage2 
 
 # Bootloader stage 1
 # Give the first stage it's own compilation rule
@@ -77,6 +76,18 @@ build_bootloader_stage2: $(BOOTLOADER_STAGE2_FILES)
 		-TLinkerScripts/Stage2Linker.ld \
 		-o ./Build/BootloaderStage2/Stage2.boot \
 		$(BOOTLOADER_STAGE2_FILES)
+
+KERNEL_FILES:=$(addsuffix .o,\
+	$(basename $(patsubst ./Source%, ./Build%,\
+	$(wildcard ./Source/Kernel/*.asm\
+	$(wildcard ./Source/Kernel/*.c)\
+))))
+
+build_kernel: $(KERNEL_FILES)
+	$(LD) \
+		-TLinkerScripts/Kernel.ld \
+		-o ./Build/Kernel/Kernel.kernel \
+		$(KERNEL_FILES)
 
 # Generate a floppy image
 floppy_image: build

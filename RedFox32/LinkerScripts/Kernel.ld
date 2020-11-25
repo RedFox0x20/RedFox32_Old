@@ -1,21 +1,12 @@
 OUTPUT_FORMAT("binary")
 OUTPUT_ARCH(i386)
+ENTRY(KMain)
 
 SECTIONS
 {
-	. = 0x10000;
-	.text :
+	.text : 
 	{
-		Build/Kernel/KernelA.o(.text)
-	}
-	.data : {
-		Build/Kernel/KernelA.o(.data)
-	}
-	.text : {
+		Build/Kernel/KEntry.o(*.text)
 		*(.text)
 	}
-	.data : {
-		*(.data)
-	}
 }
-
