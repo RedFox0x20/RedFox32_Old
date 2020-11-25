@@ -62,6 +62,9 @@ LoadStage2:
     jc Error					; In the event of an error jump to an error
 								; handling routine
 								;
+	cmp al, 16					; Test to see if we read all 16 requested
+								; sectors
+	jne LoadStage2
 	; This is used for tracking purposes, it is actually a waste of bytes once
 	; we get so far. 
     mov ah, 0x0E	; Print TTY
