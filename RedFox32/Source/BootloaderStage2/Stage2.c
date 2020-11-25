@@ -52,6 +52,7 @@ void DEBUG_DumpMMAP(void)
 
 int Stage2_CEntry(void)
 {
+	SetupVideo();
 	DEBUG_DumpMMAP();
 	return 0;
 }
