@@ -44,14 +44,8 @@ EnteringStopLoopStr: db "C has exited, halting system!", 0
 
 Stage2:
 mov byte [BootDevice], dl
-; Enter a known video mode, 80 columns
-mov ax, 0x0003	; Mode 3, 80 column mode, 16 colour
-int 0x10		; Call the 0x10 BIOS interrupt
 
-; Disable the text mode cursor, it is not required
-mov ax, 0x0100	; ah 0x01, al 0x00
-mov cx, 0x3F00	; ch 0x3F, cl 0x00
-int 0x10		; Call the 0x10 BIOS interrupt
+call VideoSetup
 
 ; Identify stage 2 entry
 mov ah, 0x0E	; TTY Print
@@ -75,6 +69,7 @@ mov	sp, 0xFFFF	; Set the End of the stack to 0xFFFF
 sti
 mov dword [0x8000], 0	; Set the number of entries to 0
 call CreateMemoryMap
+call VideoSetup
 cli
 
 ; Loading the Global Descriptor Table
@@ -88,6 +83,19 @@ mov	cr0, eax	; Set cr0
 	
 ; Jump to the 32bit code
 jmp	0x08:Stage232 ; far jump to fix CS. Remember that the code selector is 0x8!
+
+VideoSetup:
+; Enter a known video mode, 80 columns
+mov ax, 0x0003	; Mode 3, 80 column mode, 16 colour
+int 0x10		; Call the 0x10 BIOS interrupt
+
+; Disable the text mode cursor, it is not required
+mov ax, 0x0100	; ah 0x01, al 0x00
+mov cx, 0x3F00	; ch 0x3F, cl 0x00
+int 0x10		; Call the 0x10 BIOS interrupt
+
+ret
+
 
 ; Load kernel
 LoadKernel:
@@ -234,6 +242,9 @@ mov esp, 0xFFFF		; Set the top of the stack to
 call EnableA20
 
 ; Call into the C-Code
+; It should be recognised that from here we can actually just jump to the
+; kernel; However, it is useful to have some Stage2 C code for debugging
+; purposes I.E Dumping the memory map
 call Stage2_CEntry
 
 ; C code has returned
