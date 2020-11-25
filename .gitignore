@@ -3,3 +3,4 @@
 *.dmp
 *.img
 *.boot
+*.kernel
