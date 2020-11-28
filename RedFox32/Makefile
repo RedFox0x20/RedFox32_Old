@@ -73,7 +73,7 @@ BOOTLOADER_STAGE2_FILES:=$(addsuffix .o,\
 ))))
 build_bootloader_stage2: $(BOOTLOADER_STAGE2_FILES)
 	@echo "Building BootloaderStage2"
-	$(LD) \
+	@$(LD) \
 		-TLinkerScripts/Stage2Linker.ld \
 		-o ./Build/BootloaderStage2/Stage2.boot \
 		$(BOOTLOADER_STAGE2_FILES)
@@ -85,7 +85,7 @@ KERNEL_FILES:=$(addsuffix .o,\
 ))))
 
 build_kernel: $(KERNEL_FILES)
-	$(LD) \
+	@$(LD) \
 		-TLinkerScripts/Kernel.ld \
 		-o ./Build/Kernel/Kernel.kernel \
 		$(KERNEL_FILES)
