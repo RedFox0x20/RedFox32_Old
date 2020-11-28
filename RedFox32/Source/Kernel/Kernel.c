@@ -1,12 +1,14 @@
 #include <Kernel/IDT.h>
+#include <Kernel/Syscalls.h>
 #include <Kernel/IO.h>
 
 int KMain()
 {
 	IDT_Setup();
-	outb(0x21, 0xFD);
+	Syscalls_Setup();
 	asm volatile ("sti");
-	while (1) { asm volatile ("hlt"); }
+	asm volatile ("int $0x80");
+	for(;;) asm volatile("hlt");
 	return 0;
 }
 

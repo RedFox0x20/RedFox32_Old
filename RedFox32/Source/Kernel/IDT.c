@@ -1,5 +1,6 @@
 #include <Kernel/IO.h>
-#
+#include <Kernel/Registers32.h>
+
 #define IDT_ENTRY_COUNT 256
 
 struct IDT_Entry
@@ -19,26 +20,38 @@ struct IDT_Pointer
 
 static struct IDT_Entry IDT[IDT_ENTRY_COUNT];
 
-void (*InterruptHandlers[16])(void);
+static const struct IDT_Pointer IDTPtr = 
+{
+	.Limit = (sizeof(struct IDT_Entry) * IDT_ENTRY_COUNT) - 1,
+	.Ptr = IDT
+};
 
-extern void
-	Int_0(void),
-	Int_1(void),
-	Int_2(void),
-	Int_3(void),
-	Int_4(void),
-	Int_5(void),
-	Int_6(void),
-	Int_7(void),
-	Int_8(void),
-	Int_9(void),
-	Int_10(void),
-	Int_11(void),
-	Int_12(void),
-	Int_13(void),
-	Int_14(void),
-	Int_15(void);
+void (*InterruptHandlers[17])(void);
 
+/* Ensure that we are aware of the Int_# functions which exist within IDTA.asm
+ */
+extern void Int_0(void),
+	   Int_1(void),
+	   Int_2(void),
+	   Int_3(void),
+	   Int_4(void),
+	   Int_5(void),
+	   Int_6(void),
+	   Int_7(void),
+	   Int_8(void),
+	   Int_9(void),
+	   Int_10(void),
+	   Int_11(void),
+	   Int_12(void),
+	   Int_13(void),
+	   Int_14(void),
+	   Int_15(void),
+	   IntSyscallHandler(void);
+
+/* We create an array of the interrupt functions as these are used within our
+ * IDT and mapped to our interrupts. The use of an array makes the assignment
+ * much easier.
+ */
 const void (*Interrupts[16])(void) = 
 {
 	Int_0,
@@ -59,7 +72,10 @@ const void (*Interrupts[16])(void) =
 	Int_15
 };
 
-extern void SetIDT(struct IDT_Pointer*);
+/* SetIDT
+ * SetIDT is used once the 
+ */
+extern void SetIDT(const struct IDT_Pointer*);
 
 /* IDT_InitializePIC
  * Remaps the PIC mappings as we do not want to use the BIOS defaults
@@ -76,12 +92,6 @@ static void IDT_InitializePIC(void)
 	outb(0xA1, 0x01);
 	outb(0x21, 0x00);
 	outb(0xA1, 0x00);
-}
-
-void DEBUG_KBD_INTERRUPT()
-{
-	((char*)0xB8000)[2] = 'I';
-	inb(0x60);
 }
 
 /* IDT_SetInterruptEntry
@@ -105,14 +115,27 @@ static unsigned int IDT_SetInterruptEntry(unsigned int EID, void (*Func)(void))
 	return (unsigned int)Entry;
 }
 
+/* IDT_Setup
+ * Does everything necessary to setup the IDT so that the system remains stable
+ * and supports interrupts.
+ */
 void IDT_Setup(void)
 {
 	IDT_InitializePIC();
-	for (unsigned int i = 0; i < 16; i++)
+
+	/* Ensure that the InterruptHandlers pointers are all null to avoid
+	 * accidentally calling somewhere random in memory which could cause
+	 * problems.
+	 */
+	for (unsigned int i = 0; i < 17; i++)
 	{
 		InterruptHandlers[i] = 0;
 	}
-	for (int i = 0; i < IDT_ENTRY_COUNT; i++)
+
+	/* Null out the first 32 entries, these are used by the processor for events
+	 * such as a page fault.
+	 */
+	for (int i = 0; i < 32; i++)
 	{
 		IDT[i].OffsetLow = 0;
 		IDT[i].OffsetHigh = 0;
@@ -120,19 +143,43 @@ void IDT_Setup(void)
 		IDT[i].Selector = 0;
 		IDT[i].TypeAttributes = 0;
 	}
+
+	/* The next 16 interrupts are hardware interrupts which we care about. These
+	 * are events such as keyboard input so we have created a function in
+	 * assembly to handle them, this then calls into the InterruptHandlerStub
+	 * which can call a regular (Standard C) function from the IntruptHandlers
+	 * array.
+	 */
 	for (int i = 32; i < 48; i++)
 	{
 		IDT_SetInterruptEntry(i, Interrupts[i-32]);
 	}
-	InterruptHandlers[1] = DEBUG_KBD_INTERRUPT;
-	struct IDT_Pointer IDTPtr = 
+	/* Finally we null out the remaining IDT entries.
+	*/
+	for (int i = 48; i < IDT_ENTRY_COUNT; i++)
 	{
-		.Limit = (sizeof(struct IDT_Entry) * IDT_ENTRY_COUNT) - 1,
-		.Ptr = IDT
-	};
-
-
+		IDT[i].OffsetLow = 0;
+		IDT[i].OffsetHigh = 0;
+		IDT[i].Zero = 0;
+		IDT[i].Selector = 0;
+		IDT[i].TypeAttributes = 0;
+	}
+	IDT_SetInterruptEntry(0x80, IntSyscallHandler);
+	/* Call our assembly function which is wrapping the lidt instruction for us.
+	*/
 	SetIDT(&IDTPtr);
+}
+
+void SetInterruptHandler(unsigned char ID, void (*Func)(void))
+{
+	if (ID < 16)
+	{
+		InterruptHandlers[ID] = Func;
+	}
+	if (ID == 0x80)
+	{
+		InterruptHandlers[16] = Func;
+	}
 }
 
 /* InterruptHandlerStub
@@ -142,9 +189,11 @@ void IDT_Setup(void)
  * ID: The ID number with an offset of 32 to skip the system defined interrupts
  *     32+ID
  */
-void InterruptHandlerStub(unsigned char ID)
+void InterruptHandlerStub(unsigned char ID, struct Registers32 Regs) 
 {
 	((char*)0xB8000)[0] = 'S';
+	/* Handle hardware interrupts
+	 */
 	if (ID < 16)
 	{
 		void (*Func)(void) = (void (*)(void))InterruptHandlers[ID];
@@ -153,6 +202,18 @@ void InterruptHandlerStub(unsigned char ID)
 			Func();
 		}
 	}
+	/* Handle software interrupts (system calls)
+	 */
+	else if (ID == 0x80)
+	{
+		void (*Func)(struct Registers32) = 
+			(void (*)(struct Registers32))InterruptHandlers[16];
+		if (Func != 0)
+		{
+			Func(Regs);
+		}
+	}
+
 	if (ID >= 8)
 	{
 		outb(0xA0, 0x20);

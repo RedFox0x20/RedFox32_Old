@@ -7,11 +7,11 @@
 	[GLOBAL Int_%1]
 	Int_%1:
 		pushad
-		push %1
+		push byte %1
 		call InterruptHandlerStub
 		pop eax
 		popad
-		iret
+		iretd
 %endmacro
 
 Interrupt 0
@@ -30,6 +30,16 @@ Interrupt 12
 Interrupt 13
 Interrupt 14
 Interrupt 15
+
+[GLOBAL IntSyscallHandler]
+IntSyscallHandler:
+	pushad
+	push byte 0x80
+	call InterruptHandlerStub
+	pop eax
+	popad
+	iretd
+
 
 [GLOBAL SetIDT]
 SetIDT:
