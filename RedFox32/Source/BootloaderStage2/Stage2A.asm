@@ -249,13 +249,13 @@ call EnableA20
 ; purposes I.E Dumping the memory map
 call Stage2_CEntry
 
+call 0x2900
+
 ; C code has returned
 push 0x0C					; Colour
 push EnteringStopLoopStr	; String
 call puts					; Call to the c function:
 ; puts(char *str, char colour);
-
-call 0x2900
 
 ; This would be where a system shutdown would take place however this works
 ; to just halt the system once the C-Code returns, if at all.

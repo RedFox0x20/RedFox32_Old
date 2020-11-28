@@ -48,6 +48,7 @@ clean:
 	@echo "Building $@"
 	$(CC) $(CCFLAGS) $(CCInclude) -o $@ $<
 
+
 # Generic rule for ASM files
 ./Build/BootloaderStage2/%.o ./Build/Kernel/%.o: %.asm
 	@echo "Building $@"
