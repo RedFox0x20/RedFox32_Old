@@ -133,7 +133,7 @@ void IDT_Setup(void)
 	}
 
 	/* Null out the first 32 entries, these are used by the processor for events
-	 * such as a page fault.
+	 * such as a page fault. (System exceptions)
 	 */
 	for (int i = 0; i < 32; i++)
 	{
