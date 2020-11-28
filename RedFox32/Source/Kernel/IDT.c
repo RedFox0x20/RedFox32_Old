@@ -1,6 +1,9 @@
+#include <Kernel/IDT.h>
 #include <Kernel/IO.h>
 #include <Kernel/Registers32.h>
 
+#define IDT_INTERRUPT_HANDLERS_COUNT 17
+#define IDT_SYSCALL_INTERRUPT_ID 16
 #define IDT_ENTRY_COUNT 256
 
 struct IDT_Entry
@@ -26,10 +29,10 @@ static const struct IDT_Pointer IDTPtr =
 	.Ptr = IDT
 };
 
-void (*InterruptHandlers[17])(void);
+void (*InterruptHandlers[IDT_INTERRUPT_HANDLERS_COUNT])(void);
 
 /* Ensure that we are aware of the Int_# functions which exist within IDTA.asm
- */
+*/
 extern void Int_0(void),
 	   Int_1(void),
 	   Int_2(void),
@@ -102,6 +105,8 @@ static void IDT_InitializePIC(void)
  */
 static unsigned int IDT_SetInterruptEntry(unsigned int EID, void (*Func)(void))
 {
+	/* We don't want to be setting entries for CPU Exceptions.
+	*/
 	if (EID < 32) return 0;
 
 	struct IDT_Entry *Entry = &(IDT[EID]);
@@ -121,13 +126,14 @@ static unsigned int IDT_SetInterruptEntry(unsigned int EID, void (*Func)(void))
  */
 void IDT_Setup(void)
 {
+	DisableInterrupts();
 	IDT_InitializePIC();
 
 	/* Ensure that the InterruptHandlers pointers are all null to avoid
 	 * accidentally calling somewhere random in memory which could cause
 	 * problems.
 	 */
-	for (unsigned int i = 0; i < 17; i++)
+	for (unsigned int i = 0; i < IDT_INTERRUPT_HANDLERS_COUNT; i++)
 	{
 		InterruptHandlers[i] = 0;
 	}
@@ -172,13 +178,13 @@ void IDT_Setup(void)
 
 void SetInterruptHandler(unsigned char ID, void (*Func)(void))
 {
-	if (ID < 16)
+	if (ID < IDT_INTERRUPT_HANDLERS_COUNT-1)
 	{
 		InterruptHandlers[ID] = Func;
 	}
 	if (ID == 0x80)
 	{
-		InterruptHandlers[16] = Func;
+		InterruptHandlers[IDT_SYSCALL_INTERRUPT_ID] = Func;
 	}
 }
 
@@ -191,29 +197,36 @@ void SetInterruptHandler(unsigned char ID, void (*Func)(void))
  */
 void InterruptHandlerStub(unsigned char ID, struct Registers32 Regs) 
 {
-	((char*)0xB8000)[0] = 'S';
 	/* Handle hardware interrupts
-	 */
+	*/
 	if (ID < 16)
 	{
 		void (*Func)(void) = (void (*)(void))InterruptHandlers[ID];
-		if (Func !=0)
+		if (Func != 0)
 		{
 			Func();
 		}
 	}
+
 	/* Handle software interrupts (system calls)
-	 */
+	*/
 	else if (ID == 0x80)
 	{
 		void (*Func)(struct Registers32) = 
-			(void (*)(struct Registers32))InterruptHandlers[16];
+			(void (*)(struct Registers32))
+			InterruptHandlers[IDT_SYSCALL_INTERRUPT_ID];
+
 		if (Func != 0)
 		{
 			Func(Regs);
 		}
 	}
 
+	/* All interrupts from 8+ are members of the slave pic.
+	 * Remembering that this is referring to the first 8 hardware interrupts
+	 * that have been remapped due to the CPU exceptions using the first 32
+	 * entries.
+	 */
 	if (ID >= 8)
 	{
 		outb(0xA0, 0x20);

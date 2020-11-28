@@ -1,6 +1,9 @@
 #ifndef KERNEL_IDT
 #define KERNEL_IDT
 
+#define EnableInterrupts() asm volatile ("sti")
+#define DisableInterrupts() asm volatile ("cli")
+
 #define HANDLER_PIT 0
 #define HANDLER_KEYBOARD 1
 /* Here for completeness, this is never raised. */
