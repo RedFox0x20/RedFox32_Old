@@ -5,7 +5,7 @@ RedFox32 is a hobby OS project that I am using to learn the ins and outs of the 
 ![Image of the running OS](Img/FontRenderingAndKeyboardInput.png  "Nothing to see here!")
 
 ## Why?
-Why not? Throughout the development of this project I will be producing somewhat detailed documentation providing those who wish to have their own attempt a better head start than what I could source. Sources such as [wiki.osdev.org](wiki.osdev.org)  are great however, I often found that when it came to code samples their was either existing expectations, a lack of explanations, or no code at all, only a rough explanation of what needs to happen.
+Why not? Throughout the development of this project I will be producing somewhat detailed documentation providing those who wish to have their own attempt a better head start than what I could source. Sources such as [https://wiki.osdev.org/](https://wiki.osdev.org/)  are great however, I often found that when it came to code samples their was either existing expectations, a lack of explanations, or no code at all, only a rough explanation of what needs to happen.
 
 This project is being built to run on hardware if you so wish it to!
 
@@ -15,12 +15,12 @@ I spend way too much time doing things like this! The project is made entirely u
 All development is done on Arch Linux - Kernel: 5.7.12-arch1-1 so if you have problems which I don't, I don't know what you're doing wrong because all you have to do is compile and run, there is a grand total of Zero dependencies!
 
 ## Where...
-Where? Where!? What do you mean where! Well I'll tell ya! You can view live development of the RedFox32 project over at [https://twitch.tv/redfoxcreates](https://twitch.tv/redfoxcreates)
+Where? Where!? What do you mean where! Well I'll tell ya! You can view live development of the RedFox32 project over at [https://twitch.tv/RedFox0x20](https://twitch.tv/RedFox0x20)
 
 Get other updates about projects from here:
 - [RSS](https://redfox32.xyz/rss.xml)
 - [Instagram](https://instagram.com/redfox0x20)
-- [WEB](https://redfox32.xyz)
+- [WEB](https://redfox32.xyz/)
 ## Documentation
 - Want to get started on your own OS project, here's a guide on what to expect with code samples of my solution to the problem, you can even follow the guide like a tutorial! [RedFox32 OS Development Guide](Documentation/RedFox32DevelopersGuide.pdf)
 - Or how about developing an application for the RedFox32 project: [RedFox32 Software Development guide](RedFox32/Documentation/RedFox32SoftwareDevelopmentGuide.pdf)
