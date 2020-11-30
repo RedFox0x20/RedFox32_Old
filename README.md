@@ -1,5 +1,7 @@
 # RedFox32.xyz
 ### I overhaul a lot of the system often as I learn, this is going to happen soon!
+> I've noticed an increase in interest in the project as I have been more active on it again. Please keep in mind I am rarely updating the documentation at the moment as I build up the project base. I will keep it as up to date as possible if the interest is maintained. Please do not try to contribute towards progress, the purpose is for me to learn at my own pace and write everything I can by hand from documentation or by using existing code as a reference. If you would like to provide links to resources or any queries in general then use something from the `Where` section to contact me.
+
 ## What is this, where am I?
 RedFox32 is a hobby OS project that I am using to learn the ins and outs of the x86 Architecture in addition to helping developers (like you, perhaps) begin their own adventure into the world of bare-metal programming.
 ![Image of the running OS](Img/FontRenderingAndKeyboardInput.png  "Nothing to see here!")
