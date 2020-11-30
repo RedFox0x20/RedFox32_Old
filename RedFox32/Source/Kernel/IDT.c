@@ -2,10 +2,21 @@
 #include <Kernel/IO.h>
 #include <Kernel/Registers32.h>
 
+/* 16 hardware interrupts + 1 software interrupt
+ */
 #define IDT_INTERRUPT_HANDLERS_COUNT 17
+
+/* Syscalls are element 16 of the InterruptHandlers array.
+ */
 #define IDT_SYSCALL_INTERRUPT_ID 16
+
+/* There's a possible 256 interrupts on x86.
+ */
 #define IDT_ENTRY_COUNT 256
 
+/* IDT_Entry
+ * A standard structure for Interrupt Descriptors.
+ */
 struct IDT_Entry
 {
 	unsigned short OffsetLow;
@@ -15,20 +26,34 @@ struct IDT_Entry
 	unsigned short OffsetHigh;
 } __attribute__((packed));
 
+/* IDT_Pointer
+ * A standard structure that is required for the lidt instruction.
+ */
 struct IDT_Pointer
 {
 	unsigned short Limit;
 	void *Ptr;
 } __attribute__((packed));
 
+/* Allocate space for IDT_ENTRY_COUNT (256) IDT entries, this is the maxium
+ * number of possible interrupts. In the future this could be done at run time
+ * using some form of memory management.
+ */
 static struct IDT_Entry IDT[IDT_ENTRY_COUNT];
 
+/* IDT_Pointer IDTPtr
+ * A constant used by the LIDT instruction called in SetIDT.
+ */
 static const struct IDT_Pointer IDTPtr = 
 {
 	.Limit = (sizeof(struct IDT_Entry) * IDT_ENTRY_COUNT) - 1,
 	.Ptr = IDT
 };
 
+/* InterruptHandlers
+ * An array of handlers which can be set. These handlers are used in
+ * InterruptHandlersStub. They are set using the SetInterruptHandler method.
+ */
 void (*InterruptHandlers[IDT_INTERRUPT_HANDLERS_COUNT])(void);
 
 /* Ensure that we are aware of the Int_# functions which exist within IDTA.asm
@@ -126,6 +151,7 @@ static unsigned int IDT_SetInterruptEntry(unsigned int EID, void (*Func)(void))
  */
 void IDT_Setup(void)
 {
+	unsigned int i = 0;
 	DisableInterrupts();
 	IDT_InitializePIC();
 
@@ -133,7 +159,7 @@ void IDT_Setup(void)
 	 * accidentally calling somewhere random in memory which could cause
 	 * problems.
 	 */
-	for (unsigned int i = 0; i < IDT_INTERRUPT_HANDLERS_COUNT; i++)
+	for (; i < IDT_INTERRUPT_HANDLERS_COUNT; i++)
 	{
 		InterruptHandlers[i] = 0;
 	}
@@ -141,13 +167,13 @@ void IDT_Setup(void)
 	/* Null out the first 32 entries, these are used by the processor for events
 	 * such as a page fault. (System exceptions)
 	 */
-	for (int i = 0; i < 32; i++)
+	for (i = 0; i < 32; i++)
 	{
-		IDT[i].OffsetLow = 0;
-		IDT[i].OffsetHigh = 0;
-		IDT[i].Zero = 0;
-		IDT[i].Selector = 0;
-		IDT[i].TypeAttributes = 0;
+		IDT[i].OffsetLow 		= 0;
+		IDT[i].OffsetHigh 		= 0;
+		IDT[i].Zero 			= 0;
+		IDT[i].Selector 		= 0;
+		IDT[i].TypeAttributes 	= 0;
 	}
 
 	/* The next 16 interrupts are hardware interrupts which we care about. These
@@ -156,21 +182,26 @@ void IDT_Setup(void)
 	 * which can call a regular (Standard C) function from the IntruptHandlers
 	 * array.
 	 */
-	for (int i = 32; i < 48; i++)
+	for (; i < 48; i++)
 	{
 		IDT_SetInterruptEntry(i, Interrupts[i-32]);
 	}
+	
 	/* Finally we null out the remaining IDT entries.
 	*/
-	for (int i = 48; i < IDT_ENTRY_COUNT; i++)
+	for (; i < IDT_ENTRY_COUNT; i++)
 	{
-		IDT[i].OffsetLow = 0;
-		IDT[i].OffsetHigh = 0;
-		IDT[i].Zero = 0;
-		IDT[i].Selector = 0;
-		IDT[i].TypeAttributes = 0;
+		IDT[i].OffsetLow		= 0;
+		IDT[i].OffsetHigh 		= 0;
+		IDT[i].Zero 			= 0;
+		IDT[i].Selector 		= 0;
+		IDT[i].TypeAttributes 	= 0;
 	}
-	IDT_SetInterruptEntry(0x80, IntSyscallHandler);
+	
+	/* Register our syscall (software interrupt) handler. 
+	 */
+	IDT_SetInterruptEntry(HANDLER_SYSCALLS, IntSyscallHandler);
+	
 	/* Call our assembly function which is wrapping the lidt instruction for us.
 	*/
 	SetIDT(&IDTPtr);
@@ -182,6 +213,7 @@ void SetInterruptHandler(unsigned char ID, void (*Func)(void))
 	{
 		InterruptHandlers[ID] = Func;
 	}
+	
 	if (ID == 0x80)
 	{
 		InterruptHandlers[IDT_SYSCALL_INTERRUPT_ID] = Func;

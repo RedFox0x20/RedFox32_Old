@@ -243,19 +243,9 @@ mov esp, 0xFFFF		; Set the top of the stack to
 ; Enable the A20 addressing line
 call EnableA20
 
-; Call into the C-Code
-; It should be recognised that from here we can actually just jump to the
-; kernel; However, it is useful to have some Stage2 C code for debugging
-; purposes I.E Dumping the memory map
-call Stage2_CEntry
-
+; Push our memory map location
+push dword mmap_ent 
 call 0x2900
-
-; C code has returned
-push 0x0C					; Colour
-push EnteringStopLoopStr	; String
-call puts					; Call to the c function:
-; puts(char *str, char colour);
 
 ; This would be where a system shutdown would take place however this works
 ; to just halt the system once the C-Code returns, if at all.

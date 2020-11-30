@@ -26,7 +26,8 @@ build: build_bootloader build_kernel
 floppy: build floppy_image
 
 usb: build
-	@echo "You are about to write to the /dev/sdb storage device... Continue? CTRL+C to cancel!"
+	@echo "You are about to write to the /dev/sdb storage device..."
+	@echo "Continue? CTRL+C to cancel!"
 	@read
 	DISK_IMAGE_FILE=/dev/sdb ./DiskBuilder.sh
 
@@ -46,13 +47,13 @@ clean:
 # Generic rule for C files
 ./Build/BootloaderStage2/%.o ./Build/Kernel/%.o: %.c
 	@echo "Building $@"
-	$(CC) $(CCFLAGS) $(CCInclude) -o $@ $<
+	@$(CC) $(CCFLAGS) $(CCInclude) -o $@ $<
 
 
 # Generic rule for ASM files
 ./Build/BootloaderStage2/%.o ./Build/Kernel/%.o: %.asm
 	@echo "Building $@"
-	$(AS) -felf32 $< -o $@
+	@$(AS) -felf32 $< -o $@
 
 # Bootloader
 build_bootloader: build_bootloader_stage1 build_bootloader_stage2 
@@ -63,7 +64,7 @@ build_bootloader: build_bootloader_stage1 build_bootloader_stage2
 # be compiled to elf files
 build_bootloader_stage1: ./Source/BootloaderStage1/Bootloader.asm
 	@echo "Building BootloaderStage1"
-	$(AS) -fbin ./$< -o ./Build/BootloaderStage1/Bootloader.o
+	@$(AS) -fbin ./$< -o ./Build/BootloaderStage1/Bootloader.o
 
 # Bootloader stage 2
 BOOTLOADER_STAGE2_FILES:=$(addsuffix .o,\
@@ -71,6 +72,7 @@ BOOTLOADER_STAGE2_FILES:=$(addsuffix .o,\
 	$(wildcard ./Source/BootloaderStage2/*.asm\
 	$(wildcard ./Source/BootloaderStage2/*.c)\
 ))))
+
 build_bootloader_stage2: $(BOOTLOADER_STAGE2_FILES)
 	@echo "Building BootloaderStage2"
 	@$(LD) \

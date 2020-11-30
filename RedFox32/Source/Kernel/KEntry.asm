@@ -13,8 +13,6 @@
 ; the kernel and bootloader or sharing any symbols.
 KEntry:
 	; Enter our C code
-	call KMain
-	; Return to the bootloader for cleanup... In the future this probably will
-	; not be necessary when proper power management is implemented and as such,
-	; the ability to power off the machine.
-	ret
+	; A jump is used here as we have already passed parameters on the stack.
+	; This is just a wrapper
+	jmp KMain

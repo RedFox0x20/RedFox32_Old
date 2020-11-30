@@ -1,12 +1,11 @@
-#include <BootloaderStage2/Video.h>
+#include <Kernel/TextMode.h>
 
 static unsigned int ScreenPos = 0;
 
-void SetupVideo(void)
+void Video_Setup(void)
 {
 	ScreenPos = 0;
 }
-
 
 void ScrollScreen(unsigned char Lines)
 {
@@ -49,4 +48,20 @@ void puts(char *str, char Colour)
 		putch(*str, Colour);
 		str++;
 	}
+}
+
+void putch_hex(char c, char Colour)
+{
+	char h = c >> 4;
+	h &= 0x0F;
+	h |= 0x30;
+	if (h > '9') { h += 7; }
+
+	char l = c;
+	l &= 0x0F;
+	l |= 0x30;
+	if (l > '9') { l += 7; }
+
+	putch(h, Colour);
+	putch(l, Colour);
 }
