@@ -7,6 +7,8 @@ void TextMode_Setup(void)
 	ScreenPos = 0;
 }
 
+/* This function can be optimised... See `rep stosw`
+ */
 void ScrollScreen(unsigned char Lines)
 {
 	unsigned char
@@ -41,6 +43,10 @@ void putch(char ch, char Colour)
 	VIDEO_MEMORY[ScreenPos++] = Colour;
 }
 
+/* It could also be possible to improve the performance of puts with `rep movsb`
+ * given that appropriate testing is performed to ensure we don't overrun the
+ * memory available to us.
+ */
 void puts(char *str, char Colour)
 {
 	while (*str != 0)
