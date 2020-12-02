@@ -18,6 +18,12 @@ struct KeyboardModifiers
 		RightShift	:1; /* Bit 5 */
 } Modifiers;
 
+void UpdateLEDS(void)
+{
+	outb(0xED, 0x64);
+	outb(*(char*)&Modifiers & 0b00000111, 0x64);
+}
+
 void Keyboard_Handler(void)
 {
 	unsigned char Keycode = inb(KEYBOARD_DATA_PORT);
@@ -47,6 +53,15 @@ void Keyboard_Handler(void)
 			return;
 		case 0x3A:
 			if (State == KEY_STATE_UP) { Modifiers.CapsLock ^= 1; }
+			UpdateLEDS();
+			return;
+		case 0x45:
+			if (State == KEY_STATE_UP) { Modifiers.NumLock ^= 1; }
+			UpdateLEDS();
+			return;
+		case 0x46:
+			if (State == KEY_STATE_UP) { Modifiers.ScrollLock ^= 1; }
+			UpdateLEDS();
 			return;
 		default:
 			break;
