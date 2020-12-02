@@ -7,7 +7,9 @@
 #define VGA_MEMORY_SIZE VGA_XRESOLUTION * VGA_YRESOLUTION
 
 
-void Video_Setup(void);
+void TextMode_Setup(void);
+void TextMode_ShowColours(void);
+
 void putch(char c, char Colour);
 void putch_hex(char c, char Colour);
 void puts(char *str, char Colour);

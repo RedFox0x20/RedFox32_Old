@@ -2,7 +2,7 @@
 
 static unsigned int ScreenPos = 0;
 
-void Video_Setup(void)
+void TextMode_Setup(void)
 {
 	ScreenPos = 0;
 }
@@ -14,7 +14,7 @@ void ScrollScreen(unsigned char Lines)
 		*ReadPos = (unsigned char *)(VIDEO_MEMORY + VGA_XRESOLUTION * Lines);
 
 	/* There is probably a better way to do this...
-	 */
+	*/
 	while (ReadPos != (unsigned char *)(VIDEO_MEMORY + VGA_MEMORY_SIZE))
 	{
 		*WritePos = *ReadPos;
@@ -34,7 +34,7 @@ void putch(char ch, char Colour)
 	if (ch == '\n')
 	{
 		ScreenPos = (ScreenPos + VGA_XRESOLUTION) -
-					(ScreenPos % VGA_XRESOLUTION);
+			(ScreenPos % VGA_XRESOLUTION);
 		return;
 	}
 	VIDEO_MEMORY[ScreenPos++] = ch;
@@ -64,4 +64,15 @@ void putch_hex(char c, char Colour)
 
 	putch(h, Colour);
 	putch(l, Colour);
+}
+
+void TextMode_ShowColours(void)
+{
+	puts("[TEXT MODE] Showing all colour combinations.\n", 0x0C);
+	short c = 0;
+	for (; c < 0x100; c++)
+	{
+		putch('#', (char)c);
+	}
+	putch('\n', 0x0A);
 }
