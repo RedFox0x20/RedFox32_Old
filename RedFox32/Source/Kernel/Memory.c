@@ -16,16 +16,24 @@ void MMAP_Display(struct MemoryMap *MMAP)
 	int MMAPEntries_Count = MMAP->NumEntries;
 	puts("MMAP_Entries: 0x", 0x0B);
 
+	/* Access the individual bytes to convert to hex
+	 */
 	putch_hex(((char*)&MMAPEntries_Count)[3], 0x0B);
 	putch_hex(((char*)&MMAPEntries_Count)[2], 0x0B);
 	putch_hex(((char*)&MMAPEntries_Count)[1], 0x0B);
 	putch_hex(((char*)&MMAPEntries_Count)[0], 0x0B);
+
+	/* Display headings to identify what each 4 byte section is for
+	 */
 	puts(
 			"\nLOW         HIGH        LEN LOW     LEN HIGH    TYPE        ACPI\n",
 			0x0B
 		);
 
-	char *b = (char*)MMAP->Entries;
+	/* Loop through the MMAP displaying it on the screen split into 32bit (4
+	 * byte) sections.
+	 */
+	char *b = (char*)&MMAP->Entries;
 	for (int i = 0; i < MMAPEntries_Count; i++)
 	{
 		/* Entries are 6*4 bytes long
