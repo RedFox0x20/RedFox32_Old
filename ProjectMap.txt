@@ -3,7 +3,6 @@ PROJECT MAP
 
 ToDo:
 	Floppy Driver
-	Keyboard Driver (Further Interrupts & Syscalls)
 	Binary file execution
 	
 
@@ -11,9 +10,14 @@ If desired ToDos:
 	Further graphics:
 		- VGA Driver
 		- VESA Driver
-	
+	Shutdown
+		- ACPI
+			- RSDP
+			- RSDT
+			- FADT
 InProgress:
-	- Text Mode Driver
+	Keyboard Driver (Further Interrupts & Syscalls)
+	Text Mode Driver
 		- Output only
 		- Waiting on keyboard driver
 
