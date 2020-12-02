@@ -19,5 +19,6 @@ struct MemoryMap
 };
 
 unsigned int MMAP_Length(struct MemoryMap *Map);
+void MMAP_Display(struct MemoryMap *MMAP);
 
 #endif

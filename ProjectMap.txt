@@ -1,0 +1,31 @@
+PROJECT MAP
+===========
+
+ToDo:
+	Floppy Driver
+	Binary file execution
+	
+
+If desired ToDos:
+	Further graphics:
+		- VGA Driver
+		- VESA Driver
+	Shutdown
+		- ACPI
+			- RSDP
+			- RSDT
+			- FADT
+InProgress:
+	Keyboard Driver (Further Interrupts & Syscalls)
+	Text Mode Driver
+		- Output only
+		- Waiting on keyboard driver
+
+Done:
+	Bootloader Stage 1
+	Bootloader Stage 2
+	System setup
+		- Protected Mode
+		- Memory map
+		- Interrupts (Foundations)
+		- System calls (Foundations)

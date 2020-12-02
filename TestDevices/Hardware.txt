@@ -16,3 +16,8 @@ TYPE:
  2: Unusable
  3: ACPI Reclaimable (Useable after finished with ACPI tables)
  4: ACPI NVS Memory  (Unusable)
+
+ VIDEO
+ =====
+ In the default text modes, the VGA device for the CLEO 2200C use bit 7 of the
+ colour byte for Blinking rather than background intensity.
