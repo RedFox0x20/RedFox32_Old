@@ -13,13 +13,23 @@
  */
 int KMain(struct MemoryMap *MMAP)
 {
+	/* Initialize the video driver
+	 */
+	TextMode_Setup();
+	TextMode_ShowColours();
+
+	/* Core setup
+	 */
 	IDT_Setup();
 	Syscalls_Setup();
 	Keyboard_Setup();
+
+	/* Once all drivers are setup we can enable interrupts.
+	 */
 	EnableInterrupts();
 
-	TextMode_Setup();
-	TextMode_ShowColours();
+	/* Any debug methods can be called here safely.
+	 */
 	MMAP_Display(MMAP);	
 	
 	/* Forever call the hlt instruction.
