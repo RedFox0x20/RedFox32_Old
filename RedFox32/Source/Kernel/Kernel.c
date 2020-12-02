@@ -4,7 +4,6 @@
 #include <Kernel/TextMode.h>
 #include <Kernel/Keyboard.h>
 
-
 /* KMain
  * The primary C function for the kernel, all setup methods should be called
  * from here in the required order. When we enter this code our bootloader has
@@ -35,6 +34,7 @@ int KMain(struct MemoryMap *MMAP)
 	 * example we are waiting on either hardware or the user to perform an
 	 * action.
 	 */
+	puts("Entered C halt loop!\n", 0x0C);
 	for(;;) asm volatile("hlt");
 	
 	/* Make it obvious for development purposes.
