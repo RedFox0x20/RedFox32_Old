@@ -12,6 +12,7 @@ unsigned int MMAP_Length(struct MemoryMap *Map)
 
 void MMAP_Display(struct MemoryMap *MMAP)
 {
+	puts("[MMAP] Displaying Memory Map Entries\n", 0x0C);
 	int MMAPEntries_Count = MMAP->NumEntries;
 	puts("MMAP_Entries: 0x", 0x0B);
 
@@ -23,7 +24,7 @@ void MMAP_Display(struct MemoryMap *MMAP)
 			"\nLOW         HIGH        LEN LOW     LEN HIGH    TYPE        ACPI\n",
 			0x0B
 		);
-	
+
 	char *b = (char*)MMAP->Entries;
 	for (int i = 0; i < MMAPEntries_Count; i++)
 	{

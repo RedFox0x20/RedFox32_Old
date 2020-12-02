@@ -2,7 +2,7 @@
 #include <Kernel/Syscalls.h>
 #include <Kernel/Memory.h>
 #include <Kernel/TextMode.h>
-
+#include <Kernel/Keyboard.h>
 
 
 /* KMain
@@ -16,10 +16,13 @@ int KMain(struct MemoryMap *MMAP)
 {
 	IDT_Setup();
 	Syscalls_Setup();
+	Keyboard_Setup();
 	EnableInterrupts();
 
-	Video_Setup();
+	TextMode_Setup();
+	TextMode_ShowColours();
 	MMAP_Display(MMAP);	
+	
 	/* Forever call the hlt instruction.
 	 * This instruction halts the CPU, this prevents it from doing anything
 	 * until an interupt occours. Having the halt here prevents the CPU from
@@ -33,7 +36,9 @@ int KMain(struct MemoryMap *MMAP)
 	 * action.
 	 */
 	for(;;) asm volatile("hlt");
-
+	
+	/* Make it obvious for development purposes.
+	 */
 	puts("Kernel exiting! Returning to Bootloader for system stop.", 0x0C);
 	return 0;
 }
