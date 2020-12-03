@@ -24,7 +24,7 @@ struct KeyboardModifiers
 		Control 		:1, /* Bit 6  */
 		Alt				:1, /* Bit 7  */
 		LeftMenu		:1, /* Bit 8  */
-		RightMenu		:1; /* Bit 9 */
+		RightMenu		:1; /* Bit 9  */
 };
 
 /* struct KeyboardEvent

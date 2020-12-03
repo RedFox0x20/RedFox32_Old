@@ -25,11 +25,19 @@ static void UpdateEventModifiers(void)
 void Keyboard_Handler(void)
 {
 	unsigned char Keycode = inb(KEYBOARD_DATA_PORT);
+	
+	/* NOTE
+	 * Some extra processing is needed for Extended keys such as Print Screen as
+	 * these keys may proceed to have the scancode for other keys, in this
+	 * example, print screen has the same keycode as an asterisk, 0x37 as per
+	 * numpad *.
+	 */
 	unsigned char Extended = (Keycode == 0xE0) ? 1 : 0;
 	if (Extended)
 	{
 		Keycode = inb(KEYBOARD_DATA_PORT);	
 	}
+
 	unsigned char State = Keycode & 0x80 ? KEY_STATE_UP : KEY_STATE_DOWN;
 	/* If they key is up then bit 0x80 is set so we can remove it to get the
 	 * normal scancode
@@ -47,33 +55,50 @@ void Keyboard_Handler(void)
 			Modifiers.Control	= State;
 			UpdateEventModifiers();
 			return;
+		
 		case KEY_LEFT_SHIFT:
 			Modifiers.LeftShift = State;
 			UpdateEventModifiers();
 			return;
+		
 		case KEY_RIGHT_SHIFT:
 			Modifiers.RightShift = State;
 			UpdateEventModifiers();
 			return;
+		
 		case KEY_CAPS_LOCK:
 			if (State == KEY_STATE_UP) { Modifiers.CapsLock ^= 1; }
 			UpdateLEDS();
 			UpdateEventModifiers();
 			return;
+		
 		case KEY_CAPS_IGNORE:
 			return;
+		
 		case KEY_NUM_LOCK:
 			if (State == KEY_STATE_UP) { Modifiers.NumLock ^= 1; }
 			UpdateLEDS();
 			UpdateEventModifiers();
 			return;
+		
 		case KEY_SCROLL_LOCK:
 			if (State == KEY_STATE_UP) { Modifiers.ScrollLock ^= 1; }
 			UpdateLEDS();
 			UpdateEventModifiers();
 			return;
+		
 		case KEY_ALT:
 			Modifiers.Alt = State;
+			UpdateEventModifiers();
+			return;
+
+		case KEY_MENU_LEFT:
+			Modifiers.LeftMenu = State;
+			UpdateEventModifiers();
+			return;
+		
+		case KEY_MENU_RIGHT:
+			Modifiers.RightMenu = State;
 			UpdateEventModifiers();
 			return;
 	}
@@ -102,7 +127,7 @@ void Keyboard_Handler(void)
 	}
 	PreviousEvent = Event;
 
-#if 1
+#if 0
 	/* This code is useful for finding out what certain keys are and under what
 	 * conditions they fire. I.E certain modifiers.
 	 */
