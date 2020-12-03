@@ -13,15 +13,25 @@
  */
 int KMain(struct MemoryMap *MMAP)
 {
+	/* Initialize the video driver
+	 */
+	TextMode_Setup();
+	TextMode_ShowColours();
+
+	/* Core setup
+	 */
 	IDT_Setup();
 	Syscalls_Setup();
 	Keyboard_Setup();
+
+	/* Once all drivers are setup we can enable interrupts.
+	 */
 	EnableInterrupts();
 
-	TextMode_Setup();
-	TextMode_ShowColours();
+	/* Any debug methods can be called here safely.
+	 */
 	MMAP_Display(MMAP);	
-	
+
 	/* Forever call the hlt instruction.
 	 * This instruction halts the CPU, this prevents it from doing anything
 	 * until an interupt occours. Having the halt here prevents the CPU from
@@ -35,7 +45,17 @@ int KMain(struct MemoryMap *MMAP)
 	 * action.
 	 */
 	puts("Entered C halt loop!\n", 0x0C);
-	for(;;) asm volatile("hlt");
+	for(;;)
+	{
+		asm volatile("hlt");
+		struct KeyboardEvent Event = Keyboard_GetEvent();
+		if (Event.Keycode != 0 && Event.State == KEY_STATE_UP)
+		{
+			puts("Received key: ", 0x0B);
+			putch(Event.Character, 0x0B);
+			putch('\n', 0x0B);
+		}
+	}
 	
 	/* Make it obvious for development purposes.
 	 */

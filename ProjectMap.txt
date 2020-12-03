@@ -3,7 +3,8 @@ PROJECT MAP
 
 ToDo:
 	Floppy Driver
-	Binary file execution
+	File system (Dependant on ^)
+	Binary file execution (Dependant on ^)
 	
 
 If desired ToDos:
@@ -15,6 +16,10 @@ If desired ToDos:
 			- RSDP
 			- RSDT
 			- FADT
+	Reboot
+		- ACPI
+		- OR Triple fault with a 0x0000:0x0000 ? Need to readup on this.
+
 InProgress:
 	Keyboard Driver (Further Interrupts & Syscalls)
 	Text Mode Driver
