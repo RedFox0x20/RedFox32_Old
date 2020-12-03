@@ -4,8 +4,16 @@ PROJECT MAP
 ToDo:
 	Floppy Driver
 	File system (Dependant on ^)
-	Binary file execution (Dependant on ^)
+	Binary file execution (Dependant on ^)*
+	Portable Executables (Dependant on ^)*
+		- ELF
+		- PE
+		- Do some research
 	
+	* The idea of seperating "Kernel space" and "User space" applications
+	  through the "ring" system may be worth looking in to, ultimately it is not
+	  a necessity with the project however it would be a good idea to look at
+	  for the creation of full and thorough documation.
 
 If desired ToDos:
 	Further graphics:
@@ -22,6 +30,9 @@ If desired ToDos:
 
 InProgress:
 	Keyboard Driver (Further Interrupts & Syscalls)
+		- Provides the basics of input and looks at implementing an "Event"
+		  based reading system. This could work however needs review and
+		  research.
 	Text Mode Driver
 		- Output only
 		- Waiting on keyboard driver
