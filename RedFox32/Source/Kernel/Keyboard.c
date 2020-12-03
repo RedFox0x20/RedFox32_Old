@@ -4,24 +4,22 @@
 #include <Kernel/Keyboard.h>
 #include <Kernel/KeyboardLayouts/GB.h>
 
-/* KerboardModifiers
- * It is important to keep the lock keys in this order as this is how they are
- * arranged for setting the keyboard LEDs.
- */
-struct KeyboardModifiers
-{
-	unsigned char
-		ScrollLock	:1, /* Bit 0 */
-		NumLock		:1, /* Bit 1 */
-		CapsLock	:1, /* Bit 2 */
-		LeftShift	:1, /* Bit 4 */
-		RightShift	:1; /* Bit 5 */
-} Modifiers;
+struct KeyboardModifiers Modifiers;
+struct KeyboardEvent	 PreviousEvent;
+
 
 void UpdateLEDS(void)
 {
-	outb(0xED, 0x64);
-	outb(*(char*)&Modifiers & 0b00000111, 0x64);
+	char c;
+	while (((c = inb(KEYBOARD_CTRL_PORT)) & 0x02) != 0) inb(KEYBOARD_DATA_PORT);
+	outb(KEYBOARD_DATA_PORT, 0xED);
+	while (((c = inb(KEYBOARD_CTRL_PORT)) & 0x02) != 0) inb(KEYBOARD_DATA_PORT);
+	outb(KEYBOARD_DATA_PORT,*(unsigned char*)&Modifiers);
+}
+
+static void UpdateEventModifiers(void)
+{
+	PreviousEvent.Modifiers = Modifiers;
 }
 
 void Keyboard_Handler(void)
@@ -45,26 +43,39 @@ void Keyboard_Handler(void)
 	 */
 	switch (Keycode)
 	{
-		case 0x2A:
+		case KEY_CONTROL:
+			Modifiers.Control	= State;
+			UpdateEventModifiers();
+			return;
+		case KEY_LEFT_SHIFT:
 			Modifiers.LeftShift = State;
+			UpdateEventModifiers();
 			return;
-		case 0x36:
+		case KEY_RIGHT_SHIFT:
 			Modifiers.RightShift = State;
+			UpdateEventModifiers();
 			return;
-		case 0x3A:
+		case KEY_CAPS_LOCK:
 			if (State == KEY_STATE_UP) { Modifiers.CapsLock ^= 1; }
 			UpdateLEDS();
+			UpdateEventModifiers();
 			return;
-		case 0x45:
+		case KEY_CAPS_IGNORE:
+			return;
+		case KEY_NUM_LOCK:
 			if (State == KEY_STATE_UP) { Modifiers.NumLock ^= 1; }
 			UpdateLEDS();
+			UpdateEventModifiers();
 			return;
-		case 0x46:
+		case KEY_SCROLL_LOCK:
 			if (State == KEY_STATE_UP) { Modifiers.ScrollLock ^= 1; }
 			UpdateLEDS();
+			UpdateEventModifiers();
 			return;
-		default:
-			break;
+		case KEY_ALT:
+			Modifiers.Alt = State;
+			UpdateEventModifiers();
+			return;
 	}
 
 	/* For regular keys we should be using an upper case character when either
@@ -75,11 +86,29 @@ void Keyboard_Handler(void)
 	 */
 	char c = 
 		(Modifiers.LeftShift || Modifiers.RightShift) ^ Modifiers.CapsLock ?
-		  KeyboardLayoutCaps[Keycode]
+		KeyboardLayoutCaps[Keycode]
 		: KeyboardLayout[Keycode];
 
+	struct KeyboardEvent Event = 
+	{
+		.Keycode = Keycode,
+		.Character = c,
+		.State = State,
+		.Modifiers = Modifiers
+	};
+	if (Extended)
+	{
+		Event.Keycode |= 0x0E00;
+	}
+	PreviousEvent = Event;
+
+#if 1
+	/* This code is useful for finding out what certain keys are and under what
+	 * conditions they fire. I.E certain modifiers.
+	 */
 	puts("[KEYBOARD]", 0x0A);
 	puts(" Modifiers=", 0x0A);
+	putch_hex(*((char*)&Modifiers+1), 0x0A);
 	putch_hex(*((char*)&Modifiers), 0x0A);
 	puts(" Extended=0x", 0x0A);
 	putch_hex(Extended, 0x0A);
@@ -90,15 +119,22 @@ void Keyboard_Handler(void)
 	puts(" Char='", 0x0A);
 	putch(c, 0x0A);
 	puts("'\n", 0x0A);
+#endif
 }
 
 void Keyboard_Setup(void)
 {
-	for (int i = 0; i < sizeof(struct KeyboardModifiers); i++)
-	{
-		((char*)&Modifiers)[i] = 0;
-	}
+	*((short*)&Modifiers) = 0;
+	UpdateLEDS();
 	SetInterruptHandler(HANDLER_KEYBOARD, Keyboard_Handler);
 }
 
-
+struct KeyboardEvent Keyboard_GetEvent(void)
+{
+	struct KeyboardEvent Event = PreviousEvent;
+	for (int i = 0; i < sizeof(struct KeyboardEvent); i++)
+	{
+		((char*)&PreviousEvent)[i] = 0;
+	}
+	return Event;
+}
