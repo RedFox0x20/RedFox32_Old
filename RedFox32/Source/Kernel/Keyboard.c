@@ -114,8 +114,9 @@ void Keyboard_Handler(void)
 		KeyboardLayoutCaps[Keycode]
 		: KeyboardLayout[Keycode];
 
-	struct KeyboardEvent Event = 
-	{
+	PreviousEvent = 
+	(struct KeyboardEvent) {
+		.Ready = 1,
 		.Keycode = Keycode,
 		.Character = c,
 		.State = State,
@@ -123,9 +124,8 @@ void Keyboard_Handler(void)
 	};
 	if (Extended)
 	{
-		Event.Keycode |= 0x0E00;
+		PreviousEvent.Keycode |= 0x0E00;
 	}
-	PreviousEvent = Event;
 
 #if 0
 	/* This code is useful for finding out what certain keys are and under what
@@ -156,10 +156,28 @@ void Keyboard_Setup(void)
 
 struct KeyboardEvent Keyboard_GetEvent(void)
 {
-	struct KeyboardEvent Event = PreviousEvent;
+	static struct KeyboardEvent Event;
+	while (!PreviousEvent.Ready) asm volatile("hlt");
 	for (int i = 0; i < sizeof(struct KeyboardEvent); i++)
 	{
+		((char*)&Event)[i] = ((char*)&PreviousEvent)[i];
 		((char*)&PreviousEvent)[i] = 0;
 	}
 	return Event;
+}
+
+char Keyboard_getch(void)
+{
+	char c = 0;
+	while (
+			c == 0 
+			|| PreviousEvent.State != KEY_STATE_DOWN 
+			|| !PreviousEvent.Ready
+		)
+	{
+		asm volatile ("hlt");
+		c = PreviousEvent.Character;
+		PreviousEvent.Ready = 0;
+	}
+	return c;
 }

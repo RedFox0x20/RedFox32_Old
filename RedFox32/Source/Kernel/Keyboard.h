@@ -38,6 +38,7 @@ struct KeyboardModifiers
  */
 struct KeyboardEvent
 {
+	unsigned char Ready;
 	unsigned short 	Keycode;
 	unsigned char	Character;
 	unsigned char	State;
@@ -46,5 +47,6 @@ struct KeyboardEvent
 
 void Keyboard_Setup(void);
 struct KeyboardEvent Keyboard_GetEvent(void);
+char Keyboard_getch(void);
 
 #endif
