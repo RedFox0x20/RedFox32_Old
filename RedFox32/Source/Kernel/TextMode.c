@@ -17,11 +17,12 @@ void ScrollScreen(unsigned char Lines)
 	/* There is probably a better way to do this...
 	*/
 	while (
-			ReadPos != (unsigned char *)(
-				TEXT_MODE_VIDEO_MEMORY + TEXT_MODE_MEMORY_SIZE)
+			ReadPos != 
+			(unsigned char *)(TEXT_MODE_VIDEO_MEMORY + TEXT_MODE_MEMORY_SIZE)
 		  )
 	{
 		*WritePos = *ReadPos;
+		*ReadPos = 0;
 		WritePos++;
 		ReadPos++;
 	}
@@ -29,20 +30,45 @@ void ScrollScreen(unsigned char Lines)
 
 void putch(char ch, char Colour)
 {
-	// Ensure we stick within our bounds
+	/* Ensure we stick within our bounds
+	*/
 	if (ScreenPos >= TEXT_MODE_MEMORY_SIZE)
 	{
 		ScrollScreen(1);
 		ScreenPos -= TEXT_MODE_XRESOLUTION;
 	}
-	if (ch == '\n')
+	switch (ch)
 	{
-		ScreenPos = (ScreenPos + TEXT_MODE_XRESOLUTION) -
-			(ScreenPos % TEXT_MODE_XRESOLUTION);
-		return;
+		case '\n':
+			ScreenPos = (ScreenPos + TEXT_MODE_XRESOLUTION) -
+				(ScreenPos % TEXT_MODE_XRESOLUTION);
+			return;
+			/* Make a TAB equivalent to 4 spaces */
+		case '\t':
+			putch(' ', Colour);
+			putch(' ', Colour);
+			putch(' ', Colour);
+			putch(' ', Colour);
+			return;
+			/* For the sake of input \b should be handled by a program reading input
+			 * in however we will also have it remove from the screen just for fun.
+			 */
+		case '\b':
+			ScreenPos-=2;
+			putch(' ', Colour);
+			ScreenPos-=2;
+			/* ScreenPos is unsigned so this works through magic.
+			*/
+			if (ScreenPos > ScreenPos+2)
+			{
+				ScreenPos = 0;
+			}
+			return;
+		default:
+			TEXT_MODE_VIDEO_MEMORY[ScreenPos++] = ch;
+			TEXT_MODE_VIDEO_MEMORY[ScreenPos++] = Colour;
+			break;
 	}
-	TEXT_MODE_VIDEO_MEMORY[ScreenPos++] = ch;
-	TEXT_MODE_VIDEO_MEMORY[ScreenPos++] = Colour;
 }
 
 void puts(char *str, char Colour)
