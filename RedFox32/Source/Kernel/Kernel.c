@@ -16,7 +16,7 @@ int KMain(struct MemoryMap *MMAP)
 	/* Initialize the video driver
 	 */
 	TextMode_Setup();
-	TextMode_ShowColours();
+	DEBUG_TextMode_ShowColours();
 
 	/* Core setup
 	 */
@@ -47,13 +47,10 @@ int KMain(struct MemoryMap *MMAP)
 	puts("Entered C halt loop!\n", 0x0C);
 	for(;;)
 	{
-		//char c = Keyboard_getch();
 		struct KeyboardEvent Event;
 		Event = Keyboard_GetEvent();
 		if (Event.State == KEY_STATE_UP) continue;
-		puts("Received key: ", 0x0B);
 		putch(Event.Character, 0x0B);
-		putch('\n', 0x0B);
 	}
 	
 	/* Make it obvious for development purposes.
