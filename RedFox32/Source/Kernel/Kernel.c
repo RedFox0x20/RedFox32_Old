@@ -16,7 +16,7 @@ int KMain(struct MemoryMap *MMAP)
 	/* Initialize the video driver
 	 */
 	TextMode_Setup();
-	TextMode_ShowColours();
+	DEBUG_TextMode_ShowColours();
 
 	/* Core setup
 	 */
