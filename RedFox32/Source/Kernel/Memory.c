@@ -54,3 +54,79 @@ void MMAP_Display(struct MemoryMap *MMAP)
 		putch('\n', 0x0B);
 	}
 }
+
+struct MemoryAllocation
+{
+	struct MemoryAllocation *Previous, *Next;
+	unsigned int Length;
+	unsigned char Flags;
+	/* Not all allocations are linear or in order so we just point to the data
+	 * instead.
+	 */
+	void *Data;
+};
+
+struct
+{
+	struct MemoryAllocation *First, *Last;
+	unsigned int Count;
+} AllocationList;
+
+struct MemoryAllocation _List_First = 
+{
+	.Previous 	= (struct MemoryAllocation*)0,
+	.Next		= (struct MemoryAllocation*)0,
+	/* This value may need changing, just prevent things from being allocated
+	 * within the kernel memory space and video memory. This is also a standard
+	 * value.
+	 * */
+	.Length		= 0x00100000,
+	.Flags = ALLOCATION_USED,
+	.Data = (void*)0;
+}
+
+void AllocationList_Add(void *Data, unsigned int Count)
+{
+	struct MemoryAllocation *Alloc = 
+		((unsigned char*)AllocationList.Last) 
+		+ sizeof(struct MemoryAllocation)
+		+ AllocationList.Last.Length;
+
+	*Alloc = 
+		(struct MemoryAllocation)
+		{
+			.Previous = AllocationList.Last,
+			.Next = (struct MemoryAllocation *)0,
+			.Length = Count,
+			.Flags = ALLOCATION_USED,
+			.Data = Data
+		};
+	AllocationList.Last.Next = Alloc;
+	AllocationList.Last = Alloc;
+	AllocationList.Count++;
+}
+
+void MemoryManagement_Setup(struct MemoryMap *MMAP)
+{
+	AllocationList.First = &_List_First;
+	AllocationList.Last  = &_List_First;
+	AllocationList.Count = 1;
+
+	for (unsigned int i = 0; i < MMAP->NumEntries; i++)
+	{
+		/* Check unusable regions */
+		if (
+				(MMPA->Entries[i].Type == MMAP_TYPE_UNUSABLE
+				 || MMAP->Entries[i].Type == MMAP_TYPE_NVS)
+				/* Our standard blocked region
+				*/
+				&& MMAP->Entries[i].Start > 0x00100000
+		   )
+		{
+			/* Add the region to the list
+			*/
+			AllocationList_Add(MMAP->Entries[i].Start, MMAP->Entries[i].Lenght);
+		}
+
+	}
+}
