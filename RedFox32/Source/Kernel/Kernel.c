@@ -28,6 +28,8 @@ int KMain(struct MemoryMap *MMAP)
 	 */
 	EnableInterrupts();
 
+	MemoryManagement_Setup(MMAP);
+
 	/* Any debug methods can be called here safely.
 	 */
 	MMAP_Display(MMAP);	
@@ -44,6 +46,11 @@ int KMain(struct MemoryMap *MMAP)
 	 * example we are waiting on either hardware or the user to perform an
 	 * action.
 	 */
+	char*Magic = (char*)malloc(1024);
+	for (int i = 'a'; i < 'z'; i++)
+	{
+		Magic[i-(int)'a'] = (char)i;
+	}
 	puts("Entered C halt loop!\n", 0x0C);
 	for(;;)
 	{
