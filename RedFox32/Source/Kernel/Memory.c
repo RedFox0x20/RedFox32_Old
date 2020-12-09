@@ -59,10 +59,14 @@ void MMAP_Display(struct MemoryMap *MMAP)
  * Memory management
  */
 
+
+#define ALLOCATION_HEADER_MAGIC ((unsigned int)0xA110C000)
 struct MemoryMap *Memory_MMAP;
+static void *NextAllocationPosition = (void *)0x00100000;
 
 struct MemoryAllocation
 {
+	unsigned int AllocationHeader;
 	struct MemoryAllocation *Previous, *Next;
 	unsigned int Length;
 	unsigned char Flags;
@@ -74,6 +78,23 @@ struct
 	struct MemoryAllocation *First, *Last;
 	unsigned int NumAllocs;
 } MemoryAllocationList;
+
+void free(void *Data)
+{
+	struct MemoryAllocation *Alloc = 
+		(struct MemoryAllocation *)
+		((char*)Data - sizeof(struct MemoryAllocation));
+	
+	if (Alloc->AllocationHeader == ALLOCATION_HEADER_MAGIC)
+	{
+		Alloc->Flags = 0;
+		Alloc->AllocationHeader++;
+	}
+	else
+	{
+		puts("[MEMORY] Invalid free!\n", 0x0C);
+	}
+}
 
 void *malloc(unsigned int);
 static unsigned char CanSafelyAllocate(void **Position, unsigned int Size)
@@ -131,9 +152,8 @@ static unsigned char CanSafelyAllocate(void **Position, unsigned int Size)
 
 void *malloc(unsigned int Size)
 {
-	static void *NextAllocationPosition = (void *)0x00100000;
 	struct MemoryAllocation *Alloc;
-	
+
 	if (CanSafelyAllocate(&NextAllocationPosition, Size))
 	{
 		Alloc = NextAllocationPosition;
@@ -145,11 +165,11 @@ void *malloc(unsigned int Size)
 		else
 		{
 			Alloc->Previous = (struct MemoryAllocation*)0;
-			Alloc->Next		= (struct MemoryAllocation*)0;
 
 			MemoryAllocationList.First 	= Alloc;
 		}
-
+	
+		Alloc->AllocationHeader		= ALLOCATION_HEADER_MAGIC; 
 		Alloc->Flags 				= 1;
 		Alloc->Length 				= Size;
 		MemoryAllocationList.Last 	= Alloc;
@@ -161,9 +181,11 @@ void *malloc(unsigned int Size)
 					+ sizeof(struct MemoryAllocation)
 					+ 1);	
 
-		return Alloc;
+		return Alloc->Data;
 	}
 
+	/* Temporary
+	 */
 	while (1)
 	{
 		puts("[MALLOC] OUT OF MEMORY!\n", 0x0C);
@@ -175,4 +197,5 @@ void *malloc(unsigned int Size)
 void MemoryManagement_Setup(struct MemoryMap *MMAP)
 {
 	Memory_MMAP = MMAP;
+	NextAllocationPosition = (void *)0x00100000;
 }

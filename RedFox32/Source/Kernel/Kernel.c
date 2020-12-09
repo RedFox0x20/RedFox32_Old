@@ -46,18 +46,24 @@ int KMain(struct MemoryMap *MMAP)
 	 * example we are waiting on either hardware or the user to perform an
 	 * action.
 	 */
-	char*Magic = (char*)malloc(1024);
+	char *Magic 	= (char*)malloc(1024);
+	char *MoreMagic = (char*)malloc(1024);
 	for (int i = 'a'; i < 'z'; i++)
 	{
 		Magic[i-(int)'a'] = (char)i;
+		MoreMagic[i-'a'] = 'z'-(i-'a');
 	}
-	puts("Entered C halt loop!\n", 0x0C);
+	free(Magic);
+	free(MoreMagic);
+	puts("Entered debug event loop!\n", 0x0C);
 	for(;;)
 	{
 		struct KeyboardEvent Event;
 		Event = Keyboard_GetEvent();
-		if (Event.State == KEY_STATE_UP) continue;
-		putch(Event.Character, 0x0B);
+		if (Event.State == KEY_STATE_DOWN)
+		{
+			putch(Event.Character, 0x0B);
+		}
 	}
 	
 	/* Make it obvious for development purposes.
