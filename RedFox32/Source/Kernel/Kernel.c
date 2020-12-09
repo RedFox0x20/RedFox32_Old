@@ -5,6 +5,24 @@
 #include <Kernel/Keyboard.h>
 #include <Kernel/IO.h>
 
+#define EMU_QEMU
+
+/* Sample power management commands
+ */
+
+/* Shutdown
+ */
+void Shutdown(void)
+{
+#ifdef EMU_QEMU
+	outw(0x0604, 0x2000);
+#elif EMU_BOCHS
+	outw(0x8004, 0x2000);
+#elif EMU_VIRTUAL_BOX
+	outw(0x4004, 0x3400);
+#endif
+}
+
 /* Reboot
  * Temporary 8042 reboot method.
  * Called when escape is pressed within the main kernel loop.
@@ -81,6 +99,10 @@ int KMain(struct MemoryMap *MMAP)
 			putch(Event.Character, 0x0B);
 			if (Event.Keycode == 1)
 			{
+				if (Event.Modifiers.LeftShift)
+				{
+					Shutdown();
+				}
 				Reboot();
 			}
 		}
