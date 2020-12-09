@@ -37,5 +37,6 @@ void MMAP_Display(struct MemoryMap *MMAP);
 
 void MemoryManagement_Setup(struct MemoryMap *MMAP);
 void *malloc(unsigned int size);
+void *realloc(void *Mem, unsigned int Size);
 void free(void *Mem);
 #endif

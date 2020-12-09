@@ -3,6 +3,30 @@
 #include <Kernel/Memory.h>
 #include <Kernel/TextMode.h>
 #include <Kernel/Keyboard.h>
+#include <Kernel/IO.h>
+
+/* Reboot
+ * Temporary 8042 reboot method.
+ * Called when escape is pressed within the main kernel loop.
+ */
+void Reboot(void)
+{
+	unsigned char tmp;
+
+	asm volatile ("cli");
+	
+	do
+	{
+		tmp = inb(0x64);
+	}	while (tmp & 0x02);
+
+	outb(0x64, 0xFE);
+
+	puts("[REBOOT] Reboot failed!", 0x0C);
+loop:
+	asm volatile ("hlt");
+	goto loop;
+}
 
 /* KMain
  * The primary C function for the kernel, all setup methods should be called
@@ -63,11 +87,17 @@ int KMain(struct MemoryMap *MMAP)
 		if (Event.State == KEY_STATE_DOWN)
 		{
 			putch(Event.Character, 0x0B);
+			if (Event.Keycode == 1)
+			{
+				Reboot();
+			}
 		}
+
+
 	}
-	
+
 	/* Make it obvious for development purposes.
-	 */
+	*/
 	puts("Kernel exiting! Returning to Bootloader for system stop.", 0x0C);
 	return 0;
 }

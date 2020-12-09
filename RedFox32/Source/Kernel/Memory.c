@@ -99,6 +99,7 @@ void free(void *Data)
 void *malloc(unsigned int);
 static unsigned char CanSafelyAllocate(void **Position, unsigned int Size)
 {
+	if (Size == 0) { return 1; }
 	/* Ensure our bounds won't wrap round below 0
 	*/
 	if (
@@ -138,7 +139,8 @@ static unsigned char CanSafelyAllocate(void **Position, unsigned int Size)
 				(*Position >= (void*)(unsigned int)Entry->Start && *Position <= 
 				 (void*)((char*)((unsigned int)Entry->Start) + Entry->Length))
 				||
-				((void*)((char*)*Position + Size) >= (void*)(unsigned int)Entry->Start
+				(((void*)((char*)*Position + Size) 
+				  >= (void*)(unsigned int)Entry->Start)
 				 && (void*)((char*)*Position + Size) <=
 				 (void*)((char*)((unsigned int)Entry->Start) + Entry->Length))
 		   )
@@ -153,7 +155,7 @@ static unsigned char CanSafelyAllocate(void **Position, unsigned int Size)
 void *malloc(unsigned int Size)
 {
 	struct MemoryAllocation *Alloc;
-
+	if (Size == 0) { return (void*)0; }
 	if (CanSafelyAllocate(&NextAllocationPosition, Size))
 	{
 		Alloc = NextAllocationPosition;
@@ -166,9 +168,9 @@ void *malloc(unsigned int Size)
 		{
 			Alloc->Previous = (struct MemoryAllocation*)0;
 
-			MemoryAllocationList.First 	= Alloc;
+			MemoryAllocationList.First = Alloc;
 		}
-	
+
 		Alloc->AllocationHeader		= ALLOCATION_HEADER_MAGIC; 
 		Alloc->Flags 				= 1;
 		Alloc->Length 				= Size;
@@ -185,7 +187,7 @@ void *malloc(unsigned int Size)
 	}
 
 	/* Temporary
-	 */
+	*/
 	while (1)
 	{
 		puts("[MALLOC] OUT OF MEMORY!\n", 0x0C);
@@ -193,6 +195,36 @@ void *malloc(unsigned int Size)
 	};
 	return (void*)0;
 }
+
+void *realloc(void *Mem, unsigned int Size)
+{
+	struct MemoryAllocation *Alloc = 
+		(struct MemoryAllocation *)
+		((char*)Mem - sizeof(struct MemoryAllocation));
+
+	if (Alloc->AllocationHeader != ALLOCATION_HEADER_MAGIC) { return (void*)0; }
+	if (Alloc->Length >= Size) { Alloc-> Length = Size; return Alloc->Data; }
+	else
+	{
+		if (Alloc->Next == (struct MemoryAllocation*)0)
+		{
+			Alloc->Length = Size;
+			return Alloc->Data;
+		}
+		else
+		{
+			void *NewDataAlloc = malloc(Size);
+			if (NewDataAlloc == (void*)0)
+			{
+				return (void*)0;
+			}
+			free(Mem);
+			return NewDataAlloc;
+		}
+	}
+}
+
+
 
 void MemoryManagement_Setup(struct MemoryMap *MMAP)
 {
