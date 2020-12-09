@@ -11,17 +11,9 @@
  */
 void Reboot(void)
 {
-	unsigned char tmp;
-
 	asm volatile ("cli");
-	
-	do
-	{
-		tmp = inb(0x64);
-	}	while (tmp & 0x02);
-
+	while (inb(0x64) & 0x02) { asm volatile ("nop"); }
 	outb(0x64, 0xFE);
-
 	puts("[REBOOT] Reboot failed!", 0x0C);
 loop:
 	asm volatile ("hlt");
@@ -38,24 +30,24 @@ loop:
 int KMain(struct MemoryMap *MMAP)
 {
 	/* Initialize the video driver
-	 */
+	*/
 	TextMode_Setup();
 	DEBUG_TextMode_ShowColours();
 
 	/* Core setup
-	 */
+	*/
 	IDT_Setup();
 	Syscalls_Setup();
 	Keyboard_Setup();
 
 	/* Once all drivers are setup we can enable interrupts.
-	 */
+	*/
 	EnableInterrupts();
 
 	MemoryManagement_Setup(MMAP);
 
 	/* Any debug methods can be called here safely.
-	 */
+	*/
 	MMAP_Display(MMAP);	
 
 	/* Forever call the hlt instruction.

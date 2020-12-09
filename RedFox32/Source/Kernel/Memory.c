@@ -84,7 +84,7 @@ void free(void *Data)
 	struct MemoryAllocation *Alloc = 
 		(struct MemoryAllocation *)
 		((char*)Data - sizeof(struct MemoryAllocation));
-	
+
 	if (Alloc->AllocationHeader == ALLOCATION_HEADER_MAGIC)
 	{
 		Alloc->Flags = 0;
