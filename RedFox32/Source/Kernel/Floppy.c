@@ -131,9 +131,6 @@ static inline void DMAWrite(void)
 	outb(0x0A, 0x02); /* Unmask DMA 2	*/
 }
 
-
-
-
 /* Initialize floppy values
 */
 void Floppy_Setup(void)

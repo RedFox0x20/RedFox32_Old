@@ -61,7 +61,7 @@ int KMain(struct MemoryMap *MMAP)
 	 */
 	TextMode_Setup();
 	Keyboard_Setup();
-	Floppy_Setup();
+	//Floppy_Setup();
 
 	
 	/* Once all drivers are setup we can enable interrupts.
