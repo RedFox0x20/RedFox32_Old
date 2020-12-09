@@ -3,6 +3,40 @@
 #include <Kernel/Memory.h>
 #include <Kernel/TextMode.h>
 #include <Kernel/Keyboard.h>
+#include <Kernel/IO.h>
+
+#define EMU_QEMU
+
+/* Sample power management commands
+ */
+
+/* Shutdown
+ */
+void Shutdown(void)
+{
+#ifdef EMU_QEMU
+	outw(0x0604, 0x2000);
+#elif EMU_BOCHS
+	outw(0x8004, 0x2000);
+#elif EMU_VIRTUAL_BOX
+	outw(0x4004, 0x3400);
+#endif
+}
+
+/* Reboot
+ * Temporary 8042 reboot method.
+ * Called when escape is pressed within the main kernel loop.
+ */
+void Reboot(void)
+{
+	asm volatile ("cli");
+	while (inb(0x64) & 0x02) { asm volatile ("nop"); }
+	outb(0x64, 0xFE);
+	puts("[REBOOT] Reboot failed!", 0x0C);
+loop:
+	asm volatile ("hlt");
+	goto loop;
+}
 
 /* KMain
  * The primary C function for the kernel, all setup methods should be called
@@ -14,22 +48,24 @@
 int KMain(struct MemoryMap *MMAP)
 {
 	/* Initialize the video driver
-	 */
+	*/
 	TextMode_Setup();
-	TextMode_ShowColours();
+	DEBUG_TextMode_ShowColours();
 
 	/* Core setup
-	 */
+	*/
 	IDT_Setup();
 	Syscalls_Setup();
 	Keyboard_Setup();
 
 	/* Once all drivers are setup we can enable interrupts.
-	 */
+	*/
 	EnableInterrupts();
 
+	MemoryManagement_Setup(MMAP);
+
 	/* Any debug methods can be called here safely.
-	 */
+	*/
 	MMAP_Display(MMAP);	
 
 	/* Forever call the hlt instruction.
@@ -44,20 +80,38 @@ int KMain(struct MemoryMap *MMAP)
 	 * example we are waiting on either hardware or the user to perform an
 	 * action.
 	 */
-	puts("Entered C halt loop!\n", 0x0C);
+	char *Magic 	= (char*)malloc(1024);
+	char *MoreMagic = (char*)malloc(1024);
+	for (int i = 'a'; i < 'z'; i++)
+	{
+		Magic[i-(int)'a'] = (char)i;
+		MoreMagic[i-'a'] = 'z'-(i-'a');
+	}
+	free(Magic);
+	free(MoreMagic);
+	puts("Entered debug event loop!\n", 0x0C);
 	for(;;)
 	{
-		//char c = Keyboard_getch();
 		struct KeyboardEvent Event;
 		Event = Keyboard_GetEvent();
-		if (Event.State == KEY_STATE_UP) continue;
-		puts("Received key: ", 0x0B);
-		putch(Event.Character, 0x0B);
-		putch('\n', 0x0B);
+		if (Event.State == KEY_STATE_DOWN)
+		{
+			putch(Event.Character, 0x0B);
+			if (Event.Keycode == 1)
+			{
+				if (Event.Modifiers.LeftShift)
+				{
+					Shutdown();
+				}
+				Reboot();
+			}
+		}
+
+
 	}
-	
+
 	/* Make it obvious for development purposes.
-	 */
+	*/
 	puts("Kernel exiting! Returning to Bootloader for system stop.", 0x0C);
 	return 0;
 }
