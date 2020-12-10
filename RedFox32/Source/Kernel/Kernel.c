@@ -4,6 +4,7 @@
 #include <Kernel/TextMode.h>
 #include <Kernel/Keyboard.h>
 #include <Kernel/IO.h>
+#include <Kernel/Floppy.h>
 
 #define EMU_QEMU
 
@@ -21,6 +22,8 @@ void Shutdown(void)
 #elif EMU_VIRTUAL_BOX
 	outw(0x4004, 0x3400);
 #endif
+	puts("[SHUTDOWN] Didn't shutdown the system!", 0x0C);
+	while (1) { asm volatile ("hlt"); }
 }
 
 /* Reboot
@@ -33,9 +36,7 @@ void Reboot(void)
 	while (inb(0x64) & 0x02) { asm volatile ("nop"); }
 	outb(0x64, 0xFE);
 	puts("[REBOOT] Reboot failed!", 0x0C);
-loop:
-	asm volatile ("hlt");
-	goto loop;
+	while (1) { asm volatile ("hlt"); }
 }
 
 /* KMain
@@ -49,23 +50,28 @@ int KMain(struct MemoryMap *MMAP)
 {
 	/* Initialize the video driver
 	*/
-	TextMode_Setup();
-	DEBUG_TextMode_ShowColours();
 
 	/* Core setup
 	*/
 	IDT_Setup();
 	Syscalls_Setup();
-	Keyboard_Setup();
+	MemoryManagement_Setup(MMAP);
 
+	/* Setup kernel drivers
+	 */
+	TextMode_Setup();
+	Keyboard_Setup();
+	//Floppy_Setup();
+
+	
 	/* Once all drivers are setup we can enable interrupts.
 	*/
 	EnableInterrupts();
 
-	MemoryManagement_Setup(MMAP);
 
 	/* Any debug methods can be called here safely.
 	*/
+	DEBUG_TextMode_ShowColours();
 	MMAP_Display(MMAP);	
 
 	/* Forever call the hlt instruction.
