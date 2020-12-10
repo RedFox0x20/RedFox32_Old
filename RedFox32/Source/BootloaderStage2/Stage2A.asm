@@ -53,9 +53,6 @@ mov al, '2'		; Character value of 2 (2 | 0x30)
 xor bx, bx		; Screen 0
 int 0x10		; Call the 0x10 BIOS interrupt
 
-; Let's load the kernel
-sti
-call LoadKernel
 
 ; Set segment registers
 cli				; Safety first! Disable interrupts.
@@ -70,8 +67,10 @@ sti
 mov dword [0x8000], 0	; Set the number of entries to 0
 call CreateMemoryMap
 call VideoSetup
-cli
+; Let's load the kernel
+call LoadKernel
 
+cli
 ; Loading the Global Descriptor Table
 ; Interrupts are still disabled from setting the registers
 lgdt [end_of_gdt] 	; Load the GDT
@@ -80,7 +79,7 @@ lgdt [end_of_gdt] 	; Load the GDT
 mov	eax, cr0	; Get the value of the cr0 register
 or	eax, 1		; Set the PE mode bit
 mov	cr0, eax	; Set cr0
-	
+
 ; Jump to the 32bit code
 jmp	0x08:Stage232 ; far jump to fix CS. Remember that the code selector is 0x8!
 
@@ -93,66 +92,92 @@ int 0x10		; Call the 0x10 BIOS interrupt
 mov ax, 0x0100	; ah 0x01, al 0x00
 mov cx, 0x3F00	; ch 0x3F, cl 0x00
 int 0x10		; Call the 0x10 BIOS interrupt
-
 ret
 
-
-; Load kernel
+KERNEL_BASE: equ 0x2900
+KERNEL_LOAD_ADDR: dw 0x2900
+KERNEL_CYLINDER_COUNT: equ 0x0002 	; 1 based - MAXIMUM 4 without es, this may
+									; need future changes to resolve in the 
+									; event I need more than 1-4 cylinders 
 LoadKernel:
-	jmp .Loop
-	nop
-	.Address: dw 0x2900
-	.CylinderCount: db 1
-	.Head: db 0
-	.Cylinder: dw 1 
-	nop
-	.Loop:
-		mov ah, 0x0E
-		mov al, 'L'
-		xor bx, bx
-		int 0x10
+	; Reset the drive
+	xor ax, ax	
+	mov dl, [BootDevice]
+	int 0x13
 
-		mov cx, 2
-		mov al, byte [.Cylinder]
-		mov ah, 0
-		div cx
-		cmp dx, 0
-		jne .One
-		mov byte [.Head], 0
-		jmp .Load
-		.One:
-		mov byte [.Head], 1
+	mov cx, 1
+.Loop:
+	; Put an L on the screen to show a sector load attempt
+	pusha
+	mov ah, 0x0E
+	mov al, 'L'
+	xor bx, bx
+	xor cx, cx
+	xor dx, dx
+	int 0x10
+	popa
+	; Call to load at given position this may need future changes, see [L:99]
+	mov bx, [KERNEL_LOAD_ADDR]
+	mov ax, cx
+	call LoadCylinder
 
-		.Load:
-		mov ah, 0x02				; Read
-		mov al, 18,					; 18 sectors
-		mov bx, word [.Address]		; To address
-		mov cx, word [.Cylinder]	; Load the cylinder to cx
-		shl cx, 6					; Cylinder is only the top 10 bits
-		mov cl, 1 					; Always start with the first sector in the
-									; cylinder
-		mov dh, byte [.Head]		; From head side
-		mov dl, byte [BootDevice]	; From the boot device
-		int 0x13					; Read it
-		jc .Load
-		cmp al, 18
-		jne .Load
-		
-		mov ax, word [.Address]
-		add ax, 0x2400
-		mov word [.Address], ax
-
-		mov al, byte [.Cylinder]
-		inc al
-		mov byte [.Cylinder], al
-
-		mov al, byte [.CylinderCount]
-		dec al
-		mov byte [.CylinderCount], al
-		cmp al, 0
-		jne .Loop
-	.Done:
+	inc cx
+	mov bx, word [KERNEL_LOAD_ADDR]
+	add bx, 0x2400
+	mov word [KERNEL_LOAD_ADDR], bx
+	cmp cx, word [KERNEL_CYLINDER_COUNT]
+	jl .Loop
 	ret
+
+; LoadCylinder
+; AX = Cylinder
+; BX = Address
+LoadCylinder:
+	jmp .Try
+.LoadError:
+	mov ah, 1
+	mov dl, byte [BootDevice]
+	int 0x13
+	call Error
+	popa
+	nop
+.Try:
+	pusha
+	; Calculate the head
+	push ax
+	push bx
+
+	mov cx, 2
+	div cl
+	mov dh, ah
+
+	pop  bx
+	pop  ax
+
+	mov cx, ax
+	;shl cx, 6
+	;or cl, 1
+	mov ah, 2
+	mov al, 18
+	mov dl, byte [BootDevice]
+	clc
+	int 0x13
+	jc .LoadError
+
+	popa
+	ret
+
+Error:
+	mov ah, 0x0E
+	mov al, 'E'
+	mov bx, 0
+	mov cx, 0
+	mov dx, 0
+	int 0x10
+.Loop:
+	cli
+	hlt
+	jmp .Loop
 
 ; use the INT 0x15, eax= 0xE820 BIOS function to get a memory map
 ; note: initially di is 0, be sure to set it to a value so that the BIOS
