@@ -96,7 +96,7 @@ ret
 
 KERNEL_BASE: equ 0x2900
 KERNEL_LOAD_ADDR: dw 0x2900
-KERNEL_CYLINDER_COUNT: equ 0x0002 	; 1 based - MAXIMUM 4 without es, this may
+KERNEL_CYLINDER_COUNT: dw 0x0001 	; 1 based - MAXIMUM 4 without es, this may
 									; need future changes to resolve in the 
 									; event I need more than 1-4 cylinders 
 LoadKernel:
@@ -107,6 +107,7 @@ LoadKernel:
 
 	mov cx, 1
 .Loop:
+	push cx
 	; Put an L on the screen to show a sector load attempt
 	pusha
 	mov ah, 0x0E
@@ -121,10 +122,12 @@ LoadKernel:
 	mov ax, cx
 	call LoadCylinder
 
-	inc cx
 	mov bx, word [KERNEL_LOAD_ADDR]
 	add bx, 0x2400
 	mov word [KERNEL_LOAD_ADDR], bx
+	
+	pop cx
+	add cx, 1
 	cmp cx, word [KERNEL_CYLINDER_COUNT]
 	jl .Loop
 	ret
@@ -262,8 +265,8 @@ mov ss, ax		; SS = 0x10 as per GDT
 
 ; Setup the stack (Ensure that there's no incorrect bits in high)
 ; Need to figure out an appropriate stack size :)
-mov ebp, 0x9000		; Set the base pointer
-mov esp, 0xFFFF		; Set the top of the stack to 
+mov esp, 0x00105000; Set the top of the stack to 
+mov ebp, 0x00100000
 
 ; Enable the A20 addressing line
 call EnableA20
