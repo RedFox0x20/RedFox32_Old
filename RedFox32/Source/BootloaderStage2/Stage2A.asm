@@ -94,9 +94,13 @@ mov cx, 0x3F00	; ch 0x3F, cl 0x00
 int 0x10		; Call the 0x10 BIOS interrupt
 ret
 
+; Using this method we can load data from 0x2900->0x00010000
+; if more memory than this is required then it will be necessary to create move
+; memory around, potential creating a "higher half kernel" however this is room
+; for ~4.5 cylinders.
 KERNEL_BASE: equ 0x2900
 KERNEL_LOAD_ADDR: dw 0x2900
-KERNEL_CYLINDER_COUNT: equ 0x0002 	; 1 based - MAXIMUM 4 without es, this may
+KERNEL_CYLINDER_COUNT: dw 0x0001 	; 1 based - MAXIMUM 4 without es, this may
 									; need future changes to resolve in the 
 									; event I need more than 1-4 cylinders 
 LoadKernel:
@@ -261,16 +265,17 @@ mov gs, ax		; GS = 0x10
 mov ss, ax		; SS = 0x10 as per GDT
 
 ; Setup the stack (Ensure that there's no incorrect bits in high)
-; Need to figure out an appropriate stack size :)
-mov ebp, 0x9000		; Set the base pointer
-mov esp, 0xFFFF		; Set the top of the stack to 
+; A 20KB stack starting at the first section of free memory, this is an assumed
+; free section
+mov ebp, 0x00105000		; Set the base pointer
+mov esp, 0x00105000		; Set the top of the stack to 
 
 ; Enable the A20 addressing line
 call EnableA20
 
 ; Push our memory map location
 push dword mmap_ent 
-call 0x2900
+call KERNEL_BASE 
 
 ; This would be where a system shutdown would take place however this works
 ; to just halt the system once the C-Code returns, if at all.

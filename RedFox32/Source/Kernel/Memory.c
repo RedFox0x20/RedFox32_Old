@@ -62,7 +62,7 @@ void MMAP_Display(struct MemoryMap *MMAP)
 
 #define ALLOCATION_HEADER_MAGIC ((unsigned int)0xA110C000)
 struct MemoryMap *Memory_MMAP;
-static void *NextAllocationPosition = (void *)0x00100000;
+static void *NextAllocationPosition = MEMORY_START;
 
 struct MemoryAllocation
 {
@@ -159,7 +159,7 @@ void *malloc(unsigned int Size)
 	if (CanSafelyAllocate(&NextAllocationPosition, Size))
 	{
 		Alloc = NextAllocationPosition;
-		if (NextAllocationPosition != (void*)0x00100000)
+		if (NextAllocationPosition != MEMORY_START)
 		{
 			Alloc->Previous 		= MemoryAllocationList.Last;
 			Alloc->Previous->Next 	= Alloc;
@@ -229,5 +229,5 @@ void *realloc(void *Mem, unsigned int Size)
 void MemoryManagement_Setup(struct MemoryMap *MMAP)
 {
 	Memory_MMAP = MMAP;
-	NextAllocationPosition = (void *)0x00100000;
+	NextAllocationPosition = MEMORY_START;
 }
