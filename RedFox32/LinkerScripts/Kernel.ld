@@ -4,7 +4,7 @@ OUTPUT_ARCH(i386)
 
 SECTIONS
 {
-	. = 0x2900;
+	. = 0x3500;
 	.text :
 	{
 		Build/Kernel/KEntry.o(*.text)

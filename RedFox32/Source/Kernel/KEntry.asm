@@ -16,3 +16,5 @@ KEntry:
 	; A jump is used here as we have already passed parameters on the stack.
 	; This is just a wrapper
 	jmp KMain
+
+db "RFKN"

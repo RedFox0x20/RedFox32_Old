@@ -98,11 +98,11 @@ ret
 ; if more memory than this is required then it will be necessary to create move
 ; memory around, potential creating a "higher half kernel" however this is room
 ; for ~4.5 cylinders.
-KERNEL_BASE: equ 0x2900
-KERNEL_LOAD_ADDR: dw 0x2900
-KERNEL_CYLINDER_COUNT: dw 0x0001 	; 1 based - MAXIMUM 4 without es, this may
+KERNEL_BASE: equ 0x3500
+LOAD_ADDR: dw 0x3500
+KERNEL_CYLINDER_COUNT: dw 0x0003 	; 1 based - MAXIMUM 4 without es, this may
 									; need future changes to resolve in the 
-									; event I need more than 1-4 cylinders 
+									; event I need more than 1-4 cylinders
 LoadKernel:
 	; Reset the drive
 	xor ax, ax	
@@ -121,14 +121,14 @@ LoadKernel:
 	int 0x10
 	popa
 	; Call to load at given position this may need future changes, see [L:99]
-	mov bx, [KERNEL_LOAD_ADDR]
+	mov bx, [LOAD_ADDR]
 	mov ax, cx
 	call LoadCylinder
 
 	inc cx
-	mov bx, word [KERNEL_LOAD_ADDR]
+	mov bx, word [LOAD_ADDR]
 	add bx, 0x2400
-	mov word [KERNEL_LOAD_ADDR], bx
+	mov word [LOAD_ADDR], bx
 	cmp cx, word [KERNEL_CYLINDER_COUNT]
 	jl .Loop
 	ret
