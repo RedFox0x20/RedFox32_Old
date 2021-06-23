@@ -1,4 +1,10 @@
-# RedFox32.xyz
+# RedFox32
+## Archived 23/06/2021 - Moved to [new repository](https://github.com/RedFox0x20/RedFox32)
+>This repository has been archived as the project is unsustainable in this format, dependancies are not clear and not proper plan of attack was produced! Additionally my development cycle changed numerous times throughout.
+This project will be continued in the [new repository](https://github.com/RedFox0x20/RedFox32). This repository will continue to exist until it is no longer of use to me.
+
+<hr>
+
 ### I overhaul a lot of the system often as I learn, this is going to happen soon!
 > I've noticed an increase in interest in the project as I have been more active on it again. Please keep in mind I am rarely updating the documentation at the moment as I build up the project base. I will keep it as up to date as possible if the interest is maintained. Please do not try to contribute towards progress, the purpose is for me to learn at my own pace and write everything I can by hand from documentation or by using existing code as a reference. If you would like to provide links to resources or any queries in general then use something from the `Where` section to contact me.
 
